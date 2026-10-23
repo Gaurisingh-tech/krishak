@@ -1,3 +1,3 @@
-import { handleRequest } from "../server/server.js";
+import handleRequest from "../server/server.js";
 
 export default handleRequest;

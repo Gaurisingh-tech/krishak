@@ -308,7 +308,7 @@ async function selfTest() {
   try { await askLLM({ lang: "en", image: null, question: 'Reply with this JSON object only: {"action":"ok"}', context: {} }); aiCheck = { ok: true, message: "" }; console.log(`AI provider test: OK (${PROVIDER}, model ${MODEL})`); }
   catch (e) { aiCheck = { ok: false, message: String(e.detail || e.message).slice(0, 300) }; console.log(`\n*** AI provider test FAILED: ${aiCheck.message}\n*** The website will not get answers until this is fixed (check the configured provider, model, and network).\n`); }
 }
-export async function handleRequest(req, res) {
+export default async function handleRequest(req, res) {
   const o = req.headers.origin;
   if (originOk(o)) { res.setHeader("Access-Control-Allow-Origin", o); res.setHeader("Vary", "Origin"); res.setHeader("Access-Control-Allow-Headers", "content-type"); res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS"); }
   const send = (code, obj) => { res.writeHead(code, { "content-type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
