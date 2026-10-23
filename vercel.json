@@ -1,4 +1,11 @@
 {
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ],
   "functions": {
     "api/[...path].js": {
       "includeFiles": "server/knowledge.json",
