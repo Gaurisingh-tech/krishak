@@ -1,13 +1,5 @@
 {
   "framework": null,
-  "buildCommand": "mkdir -p public && cp index.html public/index.html",
-  "outputDirectory": "public",
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/index.html"
-    }
-  ],
   "functions": {
     "api/[...path].js": {
       "includeFiles": "server/knowledge.json",
