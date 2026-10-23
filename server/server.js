@@ -4,12 +4,19 @@ import http from "node:http";
 import { readFileSync } from "node:fs";
 
 const PORT = Number(process.env.PORT) || 8787;
-// Provider: Anthropic (paid) or Google Gemini (has a free tier). Whichever key is set is used.
-const PROVIDER = process.env.ANTHROPIC_API_KEY ? "anthropic" : process.env.GEMINI_API_KEY ? "gemini" : null;
-const KEY = process.env.ANTHROPIC_API_KEY || process.env.GEMINI_API_KEY;
+const requestedProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
+if (requestedProvider && !["anthropic", "gemini", "ollama"].includes(requestedProvider)) {
+  throw new Error("AI_PROVIDER must be anthropic, gemini, or ollama.");
+}
+// When AI_PROVIDER is unset, preserve the existing key-based provider selection.
+const PROVIDER = requestedProvider || (process.env.ANTHROPIC_API_KEY ? "anthropic" : process.env.GEMINI_API_KEY ? "gemini" : null);
+const KEY = PROVIDER === "anthropic" ? process.env.ANTHROPIC_API_KEY : PROVIDER === "gemini" ? process.env.GEMINI_API_KEY : "";
+const AI_CONFIGURED = PROVIDER === "ollama" || Boolean(KEY);
+const OLLAMA_URL = "http://127.0.0.1:11434/api/chat";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:3b";
 // Gemini model names get retired often, so we try a list in order (set GEMINI_MODEL to force one).
 const GEMINI_MODELS = process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL] : ["gemini-3.8-flash", "gemini-3.5-flash"];
-let MODEL = PROVIDER === "gemini" ? GEMINI_MODELS[0] : process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
+let MODEL = PROVIDER === "ollama" ? OLLAMA_MODEL : PROVIDER === "gemini" ? GEMINI_MODELS[0] : process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
 const KB = JSON.parse(readFileSync(new URL("./knowledge.json", import.meta.url), "utf8"));
 const KB_SOURCE = "KRISHAK starter notes (general agronomy, not an official advisory)";
 const clip = (v, n = 80) => String(v ?? "").replace(/[<>]/g, "").trim().slice(0, n);
@@ -184,7 +191,31 @@ async function askLLM(payload) {
   const langNames = { en:"English", hi:"Hindi (Devanagari)", pa:"Punjabi (Gurmukhi)", ta:"Tamil", te:"Telugu" };
   const userText = `RESPONSE LANGUAGE: ${langNames[lang] || "English"}\n\nCONTEXT:\n${JSON.stringify(payload.context)}\n\nFARMER QUESTION (untrusted):\n${payload.question}`;
   let text = "", why = "";
-  if (PROVIDER === "gemini") {
+  if (PROVIDER === "ollama") {
+    let r, data;
+    try {
+      r = await fetch(OLLAMA_URL, {
+        method: "POST", signal: AbortSignal.timeout(120000),
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ model: MODEL, stream: false, format: "json", messages: [{ role: "system", content: SYSTEM }, { role: "user", content: userText }], options: { temperature: 0.3, num_predict: maxTokens } }),
+      });
+    } catch (e) {
+      if (e.name === "TimeoutError" || e.name === "AbortError") throw fail("ai_timeout", "Ollama did not respond before the 120-second timeout. Check the local model and try again.", 504, "Ollama request timed out.");
+      throw fail("ollama_unavailable", "Could not connect to Ollama at 127.0.0.1:11434. Start Ollama and try again.", 503, "Start Ollama and ensure its API is listening at 127.0.0.1:11434.");
+    }
+    try { data = await r.json(); }
+    catch { throw fail("ai_format", "Ollama returned an invalid response. Please try again.", 502, "Response was not valid JSON."); }
+    if (!r.ok) {
+      const message = data?.error || `Ollama request failed (${r.status})`;
+      if (r.status === 404 || /model .+ not found|model not found/i.test(message)) {
+        throw fail("ollama_model_missing", `Ollama model "${MODEL}" is not installed. Run "ollama pull ${MODEL}" and try again.`, 503, `Run "ollama pull ${MODEL}" to install the model.`);
+      }
+      throw fail("ai_error", `Ollama returned an error (${r.status}): ${message}`, 502, message);
+    }
+    if (typeof data?.message?.content !== "string") throw fail("ai_format", "Ollama returned an invalid response. Please try again.", 502, "Response did not contain message.content.");
+    text = data.message.content;
+    why = data.done_reason || "";
+  } else if (PROVIDER === "gemini") {
     let lastErr;
     const models = await geminiModels();
     for (const m of models) {
@@ -233,6 +264,7 @@ async function recommend(body) {
   const profile = { name: clip(p.name), location: clip(p.location), crop: clip(p.crop), stage: clip(p.stage), sizeAcres: Number(p.sizeAcres) || null, soil: clip(p.soil), irrigation: clip(p.irrigation) };
   const question = clip(body.question, 300), lang = normLang(body.lang), image = cleanImage(body.image);
   if (question.length < 5 || !profile.crop || !profile.location) throw fail("bad_request", "Please send a question and a complete farm profile.", 400);
+  if (image && PROVIDER === "ollama") throw fail("ollama_vision_unsupported", "The selected Ollama model is text-only and cannot analyze crop photos. Remove the photo or select Gemini or Anthropic.", 400);
   const [weather] = await Promise.all([getWeather(profile.location)]);
     let docs = retrieve(profile, question);
   if (image) { // a photo question is always about inputs: guarantee both decision notes are in the context
@@ -257,9 +289,9 @@ const originOk = (o) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o ||
 // Key check at start-up: tells you in this window (and on the page) if the key is rejected or out of quota.
 let aiCheck = null; // null = still testing, else { ok, message }
 async function selfTest() {
-  if (!KEY) return;
-  try { await askLLM({ lang: "en", image: null, question: 'Reply with this JSON object only: {"action":"ok"}', context: {} }); aiCheck = { ok: true, message: "" }; console.log(`AI key test: OK (${PROVIDER}, model ${MODEL})`); }
-  catch (e) { aiCheck = { ok: false, message: String(e.detail || e.message).slice(0, 300) }; console.log(`\n*** AI key test FAILED: ${aiCheck.message}\n*** The website will not get answers until this is fixed (wrong key, no quota, or no internet).\n`); }
+  if (!AI_CONFIGURED) return;
+  try { await askLLM({ lang: "en", image: null, question: 'Reply with this JSON object only: {"action":"ok"}', context: {} }); aiCheck = { ok: true, message: "" }; console.log(`AI provider test: OK (${PROVIDER}, model ${MODEL})`); }
+  catch (e) { aiCheck = { ok: false, message: String(e.detail || e.message).slice(0, 300) }; console.log(`\n*** AI provider test FAILED: ${aiCheck.message}\n*** The website will not get answers until this is fixed (check the configured provider, model, and network).\n`); }
 }
 http.createServer(async (req, res) => {
   const o = req.headers.origin;
@@ -267,7 +299,7 @@ http.createServer(async (req, res) => {
   const send = (code, obj) => { res.writeHead(code, { "content-type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
   if (req.method === "OPTIONS") return send(204, {});
   if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) { res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(readFileSync(new URL("../index.html", import.meta.url))); }
-  if (req.url === "/api/health") return send(200, { ok: true, aiConfigured: Boolean(KEY), aiCheck, mandiConfigured: Boolean(DATA_KEY), model: MODEL });
+  if (req.url === "/api/health") return send(200, { ok: true, aiConfigured: AI_CONFIGURED, aiCheck, mandiConfigured: Boolean(DATA_KEY), model: MODEL });
   if (req.method === "GET" && req.url.startsWith("/api/mandi")) {
     if (o && !originOk(o)) return send(403, { error: "Origin not allowed.", code: "origin" });
     if (!DATA_KEY) return send(503, { error: "Mandi prices need a free data.gov.in API key (DATA_GOV_API_KEY).", code: "no_mandi_key" });
@@ -276,7 +308,7 @@ http.createServer(async (req, res) => {
   }
   if (req.url === "/api/recommend" && req.method === "POST") {
     if (o && !originOk(o)) return send(403, { error: "Origin not allowed.", code: "origin" });
-    if (!KEY) return send(503, { error: "AI key missing. Restart start-krishak.bat and paste a key (Anthropic sk-ant-... or free Gemini AIza...).", code: "no_key" });
+    if (!AI_CONFIGURED) return send(503, { error: "No AI provider is configured. Set AI_PROVIDER and the required provider settings in server/.env.", code: "no_key" });
     try {
       req.setEncoding("utf8"); // decode as UTF-8 across chunks so Devanagari text is never split mid-character
       let raw = ""; for await (const c of req) { raw += c; if (raw.length > MAX_IMG_B64 + 20000) return send(413, { error: "Request too large.", code: "too_large" }); }
@@ -286,4 +318,4 @@ http.createServer(async (req, res) => {
     return;
   }
   send(404, { error: "Not found", code: "not_found" });
-}).listen(PORT, () => { console.log(`KRISHAK AI engine on http://localhost:${PORT}  (key ${KEY ? "found" : "MISSING"}, ${PROVIDER || "no provider"}, model ${MODEL})`); selfTest(); });
+}).listen(PORT, () => { console.log(`KRISHAK AI engine on http://localhost:${PORT}  (${AI_CONFIGURED ? "provider configured" : "provider not configured"}, ${PROVIDER || "no provider"}, model ${MODEL})`); selfTest(); });

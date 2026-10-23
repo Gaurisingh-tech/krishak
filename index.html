@@ -392,14 +392,17 @@ en: {
   "e.unreachable": "Could not reach the AI engine on this computer.",
   "e.generic": "The AI engine returned an error.",
   "e.bad_request": "Please send a question and a complete farm profile.",
-  "e.no_key": "AI key missing. Restart start-krishak.bat and paste a key (Anthropic sk-ant-... or free Gemini AIza...).",
+  "e.no_key": "No AI provider is configured. Set AI_PROVIDER and the required provider settings in server/.env.",
   "e.too_large": "Request too large.",
   "e.origin": "Origin not allowed.",
   "e.not_found": "Not found.",
   "e.ai_format": "The AI reply was not in the expected format. Please try again.",
-  "e.ai_timeout": "The AI took too long or the connection failed ({detail}). Google may be busy; please try again in a minute.",
+  "e.ai_timeout": "The AI provider took too long or the connection failed ({detail}). Check that the provider is running, then try again.",
   "e.ai_key": "Google rejected this key ({detail}). Try creating a new key in a NEW project at aistudio.google.com, or use an Anthropic key instead.",
   "e.ai_error": "The AI service returned an error: {detail}",
+  "e.ollama_unavailable": "Could not connect to Ollama at 127.0.0.1:11434. Start Ollama and try again.",
+  "e.ollama_model_missing": "The selected Ollama model is not installed. {detail}",
+  "e.ollama_vision_unsupported": "The selected Ollama model cannot analyze images. Remove the photo or select Gemini or Anthropic.",
   "modal.title": "Edit Farm Profile",
   "f.name": "Name", "f.loc": "Location", "f.crop": "Crop", "f.stage": "Crop growth stage", "f.size": "Farm size (acres)", "f.soil": "Soil type", "f.irr": "Irrigation",
   "btn.cancel": "Cancel", "btn.save": "Save changes",
@@ -484,14 +487,17 @@ hi: {
   "e.unreachable": "इस कंप्यूटर पर एआई इंजन से संपर्क नहीं हो सका।",
   "e.generic": "एआई इंजन में कोई गड़बड़ी हुई।",
   "e.bad_request": "कृपया सवाल और खेत की पूरी जानकारी भेजें।",
-  "e.no_key": "एआई कुंजी (API key) नहीं मिली। start-krishak.bat को फिर से चलाएँ और कुंजी डालें (Anthropic sk-ant-... या मुफ़्त Gemini AIza...)।",
+  "e.no_key": "एआई प्रदाता सेट नहीं है। server/.env में AI_PROVIDER और चुने गए प्रदाता की आवश्यक सेटिंग डालें।",
   "e.too_large": "अनुरोध बहुत बड़ा है।",
   "e.origin": "इस स्रोत की अनुमति नहीं है।",
   "e.not_found": "नहीं मिला।",
   "e.ai_format": "एआई का जवाब अपेक्षित रूप में नहीं आया। कृपया फिर से कोशिश करें।",
-  "e.ai_timeout": "एआई ने बहुत समय लिया या कनेक्शन टूट गया ({detail})। हो सकता है Google व्यस्त हो; कृपया एक मिनट बाद फिर कोशिश करें।",
+  "e.ai_timeout": "एआई प्रदाता ने बहुत समय लिया या कनेक्शन टूट गया ({detail})। जाँचें कि प्रदाता चल रहा है, फिर दोबारा कोशिश करें।",
   "e.ai_key": "Google ने इस कुंजी को स्वीकार नहीं किया ({detail})। aistudio.google.com पर नए प्रोजेक्ट में नई कुंजी बनाएँ, या इसके बजाय Anthropic की कुंजी इस्तेमाल करें।",
   "e.ai_error": "एआई सेवा से त्रुटि मिली: {detail}",
+  "e.ollama_unavailable": "127.0.0.1:11434 पर Ollama से संपर्क नहीं हो सका। Ollama चालू करके फिर कोशिश करें।",
+  "e.ollama_model_missing": "चुना हुआ Ollama मॉडल इंस्टॉल नहीं है। {detail}",
+  "e.ollama_vision_unsupported": "चुना हुआ Ollama मॉडल तस्वीरों का विश्लेषण नहीं कर सकता। तस्वीर हटाएँ या Gemini अथवा Anthropic चुनें।",
   "modal.title": "खेत की जानकारी बदलें",
   "f.name": "नाम", "f.loc": "स्थान", "f.crop": "फ़सल", "f.stage": "फ़सल की वृद्धि की अवस्था", "f.size": "खेत का आकार (एकड़)", "f.soil": "मिट्टी का प्रकार", "f.irr": "सिंचाई",
   "btn.cancel": "रद्द करें", "btn.save": "बदलाव सहेजें",
@@ -597,7 +603,7 @@ const API = "http://localhost:8787";
 /* Multilingual voice: browser speech recognition + speech synthesis. The chosen language is also sent to Gemini. */
 const VOICE_LOCALES = { en:"en-IN", hi:"hi-IN", pa:"pa-IN", ta:"ta-IN", te:"te-IN" };
 const VOICE_LABELS = { en:"English", hi:"हिन्दी", pa:"ਪੰਜਾਬੀ", ta:"தமிழ்", te:"తెలుగు" };
-let recognition = null;
+let recognition = null, voiceSession = null;
 function setVoiceStatus(message) { const el = $("voiceStatus"); if (el) el.textContent = message; }
 function stopSpeaking() { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); }
 function speakText(text) {
@@ -616,19 +622,95 @@ function speakText(text) {
 function startVoiceInput() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { setVoiceStatus("Voice input is not supported here. Please use the latest Chrome or Edge, or type your question."); return; }
-  if (recognition) { try { recognition.abort(); } catch {} }
-  recognition = new SR(); recognition.lang = VOICE_LOCALES[$("voiceLang").value] || "en-IN";
-  recognition.interimResults = true; recognition.continuous = false;
-  let finalTranscript = "";
+  if (voiceSession) return;
   const micButton = $("voiceInput");
-  recognition.onstart = () => { micButton.classList.add("listening"); micButton.textContent = "🔴 Listening…"; setVoiceStatus("🎙️ Listening in " + VOICE_LABELS[$("voiceLang").value] + ". Speak your farm problem now…"); };
-  recognition.onresult = (event) => { let finalText = "", interim = ""; for (let i=event.resultIndex;i<event.results.length;i++) { if(event.results[i].isFinal) finalText += event.results[i][0].transcript; else interim += event.results[i][0].transcript; } if(finalText) { finalTranscript += (finalTranscript ? " " : "") + finalText.trim(); $("q").value = finalTranscript; setVoiceStatus("Recognized: " + finalTranscript + ". Sending your question to KRISHAK…"); } else if(interim) setVoiceStatus("Hearing: " + interim); };
-  recognition.onerror = (event) => { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; setVoiceStatus(event.error === "not-allowed" ? "Microphone permission denied. Click the lock icon near the browser address and allow Microphone." : "Voice input error (" + event.error + "). Try Chrome/Edge and allow microphone, or type your question."); };
-  recognition.onend = () => { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; recognition = null; if (finalTranscript.trim().length >= 5) { hideQErr(); $("askForm").requestSubmit(); } else if (!finalTranscript.trim()) setVoiceStatus("No speech detected. Tap the microphone and try again."); };
-  try { recognition.start(); } catch { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; setVoiceStatus("Could not start the microphone. Use Chrome/Edge, allow microphone access, and try again."); }
+  const session = voiceSession = { active: true, language: $("voiceLang").value, transcript: "", recognition: null, retryNoSpeech: false };
+  const resetButton = () => { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; };
+  const begin = () => {
+    if (!session.active || voiceSession !== session) return;
+    const current = session.recognition = recognition = new SR();
+    current.lang = VOICE_LOCALES[session.language] || "en-IN";
+    current.interimResults = true; current.continuous = true;
+    current.onstart = () => { if (voiceSession === session && session.active) { micButton.classList.add("listening"); micButton.textContent = "🔴 Listening…"; setVoiceStatus("🎙️ Listening in " + VOICE_LABELS[session.language] + ". Speak your farm problem now…"); } };
+    current.onresult = (event) => {
+      if (voiceSession !== session || !session.active) return;
+      let finalText = "", interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) finalText += event.results[i][0].transcript;
+        else interim += event.results[i][0].transcript;
+      }
+      if (finalText) {
+        session.transcript += (session.transcript ? " " : "") + finalText.trim();
+        $("q").value = session.transcript;
+        if (session.transcript.trim().length >= 5) {
+          session.active = false;
+          setVoiceStatus("Recognized: " + session.transcript + ". Sending your question to KRISHAK…");
+          current.stop();
+        } else setVoiceStatus("Recognized: " + session.transcript + ". Please continue speaking or press Stop.");
+      } else if (interim) setVoiceStatus("Hearing: " + interim);
+    };
+    current.onerror = (event) => {
+      if (voiceSession !== session || !session.active) return;
+      if (event.error === "no-speech") {
+        session.retryNoSpeech = true;
+        setVoiceStatus("No speech detected yet. Still listening—speak now or press Stop.");
+        return;
+      }
+      session.active = false;
+      const messages = {
+        "not-allowed": "Microphone permission denied. Click the lock icon near the browser address and allow Microphone.",
+        "service-not-allowed": "Speech recognition is blocked. Allow microphone and speech-recognition access in your browser settings.",
+        "audio-capture": "No microphone was found. Connect or enable a microphone and try again.",
+        "network": "Speech recognition needs a working internet connection. Check your connection and try again.",
+        "language-not-supported": "Speech recognition does not support the selected language in this browser. Choose another language or type your question."
+      };
+      setVoiceStatus(messages[event.error] || "Voice input error (" + event.error + "). Try Chrome/Edge and allow microphone, or type your question.");
+    };
+    current.onend = () => {
+      if (voiceSession !== session || session.recognition !== current) return;
+      session.recognition = null;
+      recognition = null;
+      if (session.active) {
+        if (session.retryNoSpeech) {
+          session.retryNoSpeech = false;
+          setVoiceStatus("No speech detected yet. Still listening—speak now or press Stop.");
+          setTimeout(begin, 250);
+          return;
+        }
+        if (session.transcript.trim()) {
+          session.active = false;
+          setVoiceStatus("Speech ended before a complete question was captured. Tap to speak again or type your question.");
+        } else {
+          setVoiceStatus("No speech detected. Tap the microphone and try again.");
+          session.active = false;
+        }
+        voiceSession = null;
+        resetButton();
+        return;
+      }
+      voiceSession = null;
+      resetButton();
+      if (session.transcript.trim().length >= 5) { hideQErr(); $("askForm").requestSubmit(); }
+      else if (session.transcript.trim()) setVoiceStatus("Speech detected, but the question was too short. Please try again or type your question.");
+    };
+    try { current.start(); }
+    catch {
+      session.active = false; voiceSession = null; recognition = null; resetButton();
+      setVoiceStatus("Could not start the microphone. Use Chrome/Edge, allow microphone access, and try again.");
+    }
+  };
+  begin();
 }
 $("voiceInput").addEventListener("click", startVoiceInput);
-$("voiceStop").addEventListener("click", () => { if(recognition) { try { recognition.abort(); } catch {} recognition = null; } $("voiceInput").classList.remove("listening"); $("voiceInput").textContent = "🎙️ Tap to Speak"; stopSpeaking(); setVoiceStatus("Voice stopped."); });
+$("voiceStop").addEventListener("click", () => {
+  const session = voiceSession;
+  if (session) {
+    session.active = false; voiceSession = null;
+    if (session.recognition) { try { session.recognition.abort(); } catch {} }
+    recognition = null;
+  }
+  $("voiceInput").classList.remove("listening"); $("voiceInput").textContent = "🎙️ Tap to Speak"; stopSpeaking(); setVoiceStatus("Voice stopped.");
+});
 $("voiceLang").addEventListener("change", () => { setVoiceStatus("Selected language: " + VOICE_LABELS[$("voiceLang").value] + ". Tap the microphone to ask your farm problem."); });
 
 /* ---------- crop photo ---------- */
