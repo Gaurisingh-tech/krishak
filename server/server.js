@@ -2,15 +2,17 @@
 // The API key stays here (server only). Run: npm start  (needs Node 20.6+ and a .env file).
 import http from "node:http";
 import { readFileSync } from "node:fs";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { resolve } from "node:path";
 
 const PORT = Number(process.env.PORT) || 8787;
+const IS_VERCEL = Boolean(process.env.VERCEL);
 const requestedProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
 if (requestedProvider && !["anthropic", "gemini", "ollama"].includes(requestedProvider)) {
   throw new Error("AI_PROVIDER must be anthropic, gemini, or ollama.");
 }
 // When AI_PROVIDER is unset, preserve the existing key-based provider selection.
-const PROVIDER = requestedProvider || (process.env.ANTHROPIC_API_KEY ? "anthropic" : process.env.GEMINI_API_KEY ? "gemini" : null);
+const PROVIDER = IS_VERCEL && requestedProvider === "ollama" ? null : requestedProvider || (process.env.ANTHROPIC_API_KEY ? "anthropic" : process.env.GEMINI_API_KEY ? "gemini" : null);
 const KEY = PROVIDER === "anthropic" ? process.env.ANTHROPIC_API_KEY : PROVIDER === "gemini" ? process.env.GEMINI_API_KEY : "";
 const AI_CONFIGURED = PROVIDER === "ollama" || Boolean(KEY);
 const OLLAMA_URL = "http://127.0.0.1:11434/api/chat";
@@ -18,7 +20,15 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:3b";
 // Gemini model names get retired often, so we try a list in order (set GEMINI_MODEL to force one).
 const GEMINI_MODELS = process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL] : ["gemini-3.8-flash", "gemini-3.5-flash"];
 let MODEL = PROVIDER === "ollama" ? OLLAMA_MODEL : PROVIDER === "gemini" ? GEMINI_MODELS[0] : process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
-const KB = JSON.parse(readFileSync(new URL("./knowledge.json", import.meta.url), "utf8"));
+function loadKnowledge() {
+  const candidates = [fileURLToPath(new URL("./knowledge.json", import.meta.url)), resolve(process.cwd(), "server/knowledge.json")];
+  for (const path of candidates) {
+    try { return JSON.parse(readFileSync(path, "utf8")); }
+    catch (e) { if (e.code !== "ENOENT") throw e; }
+  }
+  throw new Error("Could not find server/knowledge.json in the function bundle or project directory.");
+}
+const KB = loadKnowledge();
 const KB_SOURCE = "KRISHAK starter notes (general agronomy, not an official advisory)";
 const clip = (v, n = 80) => String(v ?? "").replace(/[<>]/g, "").trim().slice(0, n);
 // Language: the site sends "en" or "hi" with each request. Anything else falls back to English.
@@ -306,7 +316,7 @@ export async function handleRequest(req, res) {
   const pathname = requestUrl.pathname;
   const allowedOrigin = !o || originOk(o) || sameOrigin(o, req.headers.host);
   if (req.method === "OPTIONS") return send(204, {});
-  if (req.method === "GET" && (pathname === "/" || pathname === "/index.html")) { res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(readFileSync(new URL("../index.html", import.meta.url))); }
+  if (!IS_VERCEL && req.method === "GET" && (pathname === "/" || pathname === "/index.html")) { res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(readFileSync(new URL("../index.html", import.meta.url))); }
   if (pathname === "/api/health" && req.method === "GET") return send(200, { ok: true, aiConfigured: AI_CONFIGURED, aiCheck, mandiConfigured: Boolean(DATA_KEY), model: MODEL });
   if (req.method === "GET" && pathname === "/api/mandi") {
     if (!allowedOrigin) return send(403, { error: "Origin not allowed.", code: "origin" });
@@ -341,7 +351,7 @@ export async function handleRequest(req, res) {
 }
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isMain) {
+if (!IS_VERCEL && isMain) {
   http.createServer(handleRequest).listen(PORT, () => {
     console.log(`KRISHAK AI engine on http://localhost:${PORT}  (${AI_CONFIGURED ? "provider configured" : "provider not configured"}, ${PROVIDER || "no provider"}, model ${MODEL})`);
     selfTest();
