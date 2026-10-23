@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/[...path].js": {
+      "includeFiles": "server/knowledge.json",
+      "maxDuration": 60
+    }
+  }
+}

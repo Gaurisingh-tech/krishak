@@ -2,6 +2,7 @@
 // The API key stays here (server only). Run: npm start  (needs Node 20.6+ and a .env file).
 import http from "node:http";
 import { readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 const PORT = Number(process.env.PORT) || 8787;
 const requestedProvider = process.env.AI_PROVIDER?.trim().toLowerCase();
@@ -286,6 +287,10 @@ async function recommend(body) {
 
 // HTTP layer (CORS limited to localhost pages such as Live Server).
 const originOk = (o) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o || "");
+const sameOrigin = (o, host) => {
+  try { return new URL(o).host.toLowerCase() === String(host || "").toLowerCase(); }
+  catch { return false; }
+};
 // Key check at start-up: tells you in this window (and on the page) if the key is rejected or out of quota.
 let aiCheck = null; // null = still testing, else { ok, message }
 async function selfTest() {
@@ -293,29 +298,52 @@ async function selfTest() {
   try { await askLLM({ lang: "en", image: null, question: 'Reply with this JSON object only: {"action":"ok"}', context: {} }); aiCheck = { ok: true, message: "" }; console.log(`AI provider test: OK (${PROVIDER}, model ${MODEL})`); }
   catch (e) { aiCheck = { ok: false, message: String(e.detail || e.message).slice(0, 300) }; console.log(`\n*** AI provider test FAILED: ${aiCheck.message}\n*** The website will not get answers until this is fixed (check the configured provider, model, and network).\n`); }
 }
-http.createServer(async (req, res) => {
+export async function handleRequest(req, res) {
   const o = req.headers.origin;
   if (originOk(o)) { res.setHeader("Access-Control-Allow-Origin", o); res.setHeader("Vary", "Origin"); res.setHeader("Access-Control-Allow-Headers", "content-type"); res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS"); }
   const send = (code, obj) => { res.writeHead(code, { "content-type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
+  const requestUrl = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
+  const pathname = requestUrl.pathname;
+  const allowedOrigin = !o || originOk(o) || sameOrigin(o, req.headers.host);
   if (req.method === "OPTIONS") return send(204, {});
-  if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) { res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(readFileSync(new URL("../index.html", import.meta.url))); }
-  if (req.url === "/api/health") return send(200, { ok: true, aiConfigured: AI_CONFIGURED, aiCheck, mandiConfigured: Boolean(DATA_KEY), model: MODEL });
-  if (req.method === "GET" && req.url.startsWith("/api/mandi")) {
-    if (o && !originOk(o)) return send(403, { error: "Origin not allowed.", code: "origin" });
+  if (req.method === "GET" && (pathname === "/" || pathname === "/index.html")) { res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); return res.end(readFileSync(new URL("../index.html", import.meta.url))); }
+  if (pathname === "/api/health" && req.method === "GET") return send(200, { ok: true, aiConfigured: AI_CONFIGURED, aiCheck, mandiConfigured: Boolean(DATA_KEY), model: MODEL });
+  if (req.method === "GET" && pathname === "/api/mandi") {
+    if (!allowedOrigin) return send(403, { error: "Origin not allowed.", code: "origin" });
     if (!DATA_KEY) return send(503, { error: "Mandi prices need a free data.gov.in API key (DATA_GOV_API_KEY).", code: "no_mandi_key" });
-    try { const q = Object.fromEntries(new URL(req.url, "http://localhost").searchParams); return send(200, await getMandi(q)); }
+    try { const q = Object.fromEntries(requestUrl.searchParams); return send(200, await getMandi(q)); }
     catch (e) { console.error("mandi failed:", e.message); return send(e.status || 502, { error: e.message, code: e.code || "mandi_error", detail: e.detail }); }
   }
-  if (req.url === "/api/recommend" && req.method === "POST") {
-    if (o && !originOk(o)) return send(403, { error: "Origin not allowed.", code: "origin" });
+  if (pathname === "/api/recommend" && req.method === "POST") {
+    if (!allowedOrigin) return send(403, { error: "Origin not allowed.", code: "origin" });
     if (!AI_CONFIGURED) return send(503, { error: "No AI provider is configured. Set AI_PROVIDER and the required provider settings in server/.env.", code: "no_key" });
     try {
-      req.setEncoding("utf8"); // decode as UTF-8 across chunks so Devanagari text is never split mid-character
-      let raw = ""; for await (const c of req) { raw += c; if (raw.length > MAX_IMG_B64 + 20000) return send(413, { error: "Request too large.", code: "too_large" }); }
-      let body; try { body = JSON.parse(raw || "{}"); } catch { throw fail("bad_request", "Please send a question and a complete farm profile.", 400); }
+      let body;
+      if (req.body !== undefined) {
+        const parsedBody = Buffer.isBuffer(req.body) ? req.body.toString("utf8") : req.body;
+        const serialized = typeof parsedBody === "string" ? parsedBody : JSON.stringify(parsedBody);
+        if (Buffer.byteLength(serialized, "utf8") > MAX_IMG_B64 + 20000) return send(413, { error: "Request too large.", code: "too_large" });
+        if (typeof parsedBody === "string") {
+          try { body = JSON.parse(parsedBody || "{}"); }
+          catch { throw fail("bad_request", "Please send a question and a complete farm profile.", 400); }
+        } else body = parsedBody;
+      } else {
+        req.setEncoding("utf8"); // decode as UTF-8 across chunks so Devanagari text is never split mid-character
+        let raw = ""; for await (const c of req) { raw += c; if (raw.length > MAX_IMG_B64 + 20000) return send(413, { error: "Request too large.", code: "too_large" }); }
+        try { body = JSON.parse(raw || "{}"); }
+        catch { throw fail("bad_request", "Please send a question and a complete farm profile.", 400); }
+      }
       send(200, await recommend(body));
     } catch (e) { console.error("recommend failed:", e.message); send(e.status || 502, { error: e.message, code: e.code || "ai_error", detail: e.detail }); }
     return;
   }
   send(404, { error: "Not found", code: "not_found" });
-}).listen(PORT, () => { console.log(`KRISHAK AI engine on http://localhost:${PORT}  (${AI_CONFIGURED ? "provider configured" : "provider not configured"}, ${PROVIDER || "no provider"}, model ${MODEL})`); selfTest(); });
+}
+
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) {
+  http.createServer(handleRequest).listen(PORT, () => {
+    console.log(`KRISHAK AI engine on http://localhost:${PORT}  (${AI_CONFIGURED ? "provider configured" : "provider not configured"}, ${PROVIDER || "no provider"}, model ${MODEL})`);
+    selfTest();
+  });
+} else if (process.env.VERCEL) void selfTest();

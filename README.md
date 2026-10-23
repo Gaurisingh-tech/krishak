@@ -65,6 +65,14 @@ Open <http://localhost:8787> in your browser. Keep the terminal running while us
 
 For Ollama, ensure the Ollama app/service is running and the configured model is installed. The server reports a clear error if Ollama is unreachable, the model is missing, a request times out, or the response is invalid. The `qwen2.5:3b` model is text-only: crop-photo analysis is unavailable with Ollama. Photo questions remain supported when using a vision-capable Gemini or Anthropic model. Mandi prices remain unavailable unless a valid optional data.gov.in key is configured. `PORT` can be set in `server/.env` to choose a different KRISHAK server port.
 
+## Deploy to Vercel
+
+The project root contains `index.html`, `vercel.json`, and the `api/` serverless entry point. Import the repository into Vercel with the project root as the Root Directory. No frontend build command or output directory is needed; Vercel serves `index.html` as a static file and routes `/api/*` to the Node.js function.
+
+In the Vercel project settings, add environment variables for a hosted AI provider, for example `AI_PROVIDER=gemini` and `GEMINI_API_KEY`, or `AI_PROVIDER=anthropic` and `ANTHROPIC_API_KEY`. Add `DATA_GOV_API_KEY` if live mandi prices are required. Never add secrets to source files or commit `server/.env`; enter deployment secrets only in Vercel's environment-variable settings. Redeploy after changing environment variables.
+
+Ollama remains supported for local development with `AI_PROVIDER=ollama` and `OLLAMA_MODEL=qwen2.5:3b`. A Vercel function cannot reach Ollama running on your Mac via `127.0.0.1`, so do not select Ollama for a Vercel deployment. Do not expose Ollama's local API port publicly to work around this limitation. Vercel function execution and request-size limits also apply; the configured function timeout is 60 seconds.
+
 ## Environment variables
 
 | Variable | Required | Purpose |
@@ -81,7 +89,7 @@ For Ollama, ensure the Ollama app/service is running and the configured model is
 ## Data handling and privacy
 
 - The farm profile and selected language are saved in the current browser's local storage. The prefilled profile is fictional demo data, as confirmed by the project owner.
-- When asking a question, the browser sends the profile, question, and selected language to the local KRISHAK server. If a photo is attached, it is sent to the configured AI provider for analysis. With Ollama, photo requests are rejected because `qwen2.5:3b` is text-only.
+- When asking a question, the browser sends the profile, question, and selected language to the same-origin KRISHAK `/api` endpoint. If a photo is attached, it is sent to the configured AI provider for analysis. With Ollama, photo requests are rejected because `qwen2.5:3b` is text-only.
 - The server requests weather using the entered location from Open-Meteo. Mandi requests send the selected state, crop, and district to data.gov.in when that feature is enabled.
 - Review the relevant service and AI-provider terms and privacy policies before sending personal or sensitive information. Do not use real farmer information in a public demo unless you have appropriate permission.
 - The app is intended for local use and is not documented or hardened as a public multi-user service.
@@ -110,6 +118,8 @@ curl http://localhost:8787/api/health
 ```
 
 The health response should show `"aiConfigured":true`, `"aiCheck":{"ok":true,...}`, and model `qwen2.5:3b`. Then submit a text question in the web app. Also attach a test photo to confirm the app reports that this text-only model cannot analyze images. If Ollama is stopped while KRISHAK remains running, its health check and recommendation requests should report Ollama as unavailable; selecting an uninstalled model should report that the model is missing. Do not expose Ollama's `11434` API port to the network.
+
+For deployment, use Vercel's preview deployment to verify `/api/health`, text recommendations, and any configured mandi requests before promoting to production. Configure provider secrets in Vercel, not in the repository.
 
 The syntax check and health request do not verify every recommendation or external service. Gemini and Anthropic can be tested separately with their respective credentials. Weather and optional mandi data still rely on their existing external services; avoid real personal data during manual testing.
 
