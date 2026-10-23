@@ -1,0 +1,19 @@
+# Local configuration and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/*credential*
+**/*secret*
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*.key
+**/*.p8
+**/*.ppk
+**/id_rsa
+**/id_ed25519
+
+# Dependencies and automation output
+**/node_modules/
+**/logs/
+**/*.log

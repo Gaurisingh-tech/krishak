@@ -1,0 +1,3 @@
+{ "name": "krishak-server", "private": true, "version": "0.1.0", "type": "module",
+  "scripts": { "start": "node --env-file=.env server.js" },
+  "engines": { "node": ">=20.6" } }

@@ -1,0 +1,218 @@
+[
+ {
+  "id": "wheat-irrigation-stages",
+  "title": "Wheat: water-sensitive growth stages",
+  "titleHi": "गेहूँ: पानी के प्रति संवेदनशील अवस्थाएँ",
+  "crop": "wheat",
+  "stages": [
+   "sowing",
+   "germination",
+   "vegetative",
+   "flowering",
+   "grain filling"
+  ],
+  "tags": [
+   "irrigat",
+   "water",
+   "moisture",
+   "pani",
+   "sinchai",
+   "सिंचाई",
+   "सिचाई",
+   "पानी",
+   "नमी",
+   "पलेवा"
+  ],
+  "text": "Wheat is most sensitive to water stress at crown root initiation (about 20-25 days after sowing), tillering, jointing, flowering, and milk/dough (grain filling). Typically 4-6 irrigations are needed in irrigated north Indian conditions; lighter soils need more frequent, lighter irrigation. Check soil moisture by hand at 5-10 cm depth before irrigating. Avoid waterlogging."
+ },
+ {
+  "id": "irrigation-weather",
+  "title": "Irrigation timing and weather",
+  "titleHi": "सिंचाई का समय और मौसम",
+  "crop": "any",
+  "stages": [],
+  "tags": [
+   "irrigat",
+   "rain",
+   "water",
+   "wind",
+   "सिंचाई",
+   "सिचाई",
+   "बारिश",
+   "बरसात",
+   "पानी",
+   "हवा",
+   "आंधी"
+  ],
+  "text": "Delay or skip irrigation if significant rain is forecast within the next 24-48 hours. Irrigate in the early morning or evening to reduce evaporation loss. Avoid irrigating just before strong wind at the flowering/grain-filling stage, as it can increase lodging risk."
+ },
+ {
+  "id": "spray-conditions",
+  "title": "Safe spraying conditions",
+  "titleHi": "छिड़काव के लिए सुरक्षित परिस्थितियाँ",
+  "crop": "any",
+  "stages": [],
+  "tags": [
+   "spray",
+   "pesticide",
+   "herbicide",
+   "fungicide",
+   "weedicide",
+   "dawai",
+   "छिड़काव",
+   "स्प्रे",
+   "दवा",
+   "दवाई",
+   "कीटनाशक",
+   "फफूंदनाशी",
+   "खरपतवारनाशी"
+  ],
+  "text": "Spray in calm, dry weather, early morning or late evening. Avoid spraying when wind is strong, when rain is expected within a few hours (rain-fast time depends on the product label), or in high midday heat. Always follow the product label for dose and safety interval, wear protective equipment, and never exceed the labelled dose."
+ },
+ {
+  "id": "wheat-vegetative",
+  "title": "Wheat: vegetative / tillering stage tasks",
+  "titleHi": "गेहूँ: वानस्पतिक वृद्धि / कल्ले निकलने की अवस्था के काम",
+  "crop": "wheat",
+  "stages": [
+   "vegetative"
+  ],
+  "tags": [
+   "stage",
+   "vegetative",
+   "tiller",
+   "fertilizer",
+   "urea",
+   "weed",
+   "nitrogen",
+   "अवस्था",
+   "खाद",
+   "उर्वरक",
+   "यूरिया",
+   "खरपतवार",
+   "नाइट्रोजन",
+   "कल्ले"
+  ],
+  "text": "During vegetative growth and tillering, typical tasks are: timely first irrigation at crown root initiation, top-dressing nitrogen as per soil-test or local recommendation, scouting and controlling weeds (commonly about 30-40 days after sowing), and checking regularly for disease such as yellow rust."
+ },
+ {
+  "id": "wheat-weeds",
+  "title": "Wheat weed management",
+  "titleHi": "गेहूँ में खरपतवार प्रबंधन",
+  "crop": "wheat",
+  "stages": [
+   "vegetative"
+  ],
+  "tags": [
+   "weed",
+   "herbicide",
+   "spray",
+   "phalaris",
+   "grass",
+   "खरपतवार",
+   "घास",
+   "मंडूसी",
+   "गुल्ली डंडा",
+   "छिड़काव",
+   "स्प्रे",
+   "दवा"
+  ],
+  "text": "Herbicide choice depends on the weed type (broadleaf versus grassy weeds) and must be applied at the crop and weed stage stated on the label. Some regions have herbicide-resistant Phalaris minor (grassy weed), so confirm what works locally with the nearest Krishi Vigyan Kendra (KVK) before buying."
+ },
+ {
+  "id": "wheat-yellow-rust",
+  "title": "Wheat disease watch: yellow rust",
+  "titleHi": "गेहूँ में रोग की निगरानी: पीला रतुआ",
+  "crop": "wheat",
+  "stages": [
+   "vegetative",
+   "flowering"
+  ],
+  "tags": [
+   "disease",
+   "rust",
+   "fungicide",
+   "spray",
+   "yellow",
+   "fog",
+   "रोग",
+   "बीमारी",
+   "रतुआ",
+   "पीला",
+   "पीली",
+   "कोहरा",
+   "फफूंद",
+   "छिड़काव",
+   "दवा"
+  ],
+  "text": "Yellow rust appears as yellow stripes of powdery spores on leaves and is favoured by cool (about 10-15 C), humid or foggy weather; it spreads by wind. Scout fields regularly, especially in cool humid spells, and report suspected infection to the local KVK or agriculture officer before spraying."
+ },
+ {
+  "id": "fertilizer-decision",
+  "title": "Deciding whether to apply fertilizer",
+  "titleHi": "खाद डालनी चाहिए या नहीं, कैसे तय करें",
+  "crop": "any",
+  "stages": [],
+  "tags": [
+   "fertilizer",
+   "fertiliser",
+   "urea",
+   "dap",
+   "nutrient",
+   "nitrogen",
+   "yellow",
+   "yellowing",
+   "pale",
+   "deficiency",
+   "khad",
+   "खाद",
+   "उर्वरक",
+   "यूरिया",
+   "डीएपी",
+   "पोषक",
+   "पीला",
+   "पीली",
+   "पीले",
+   "पत्ते"
+  ],
+  "text": "Decide fertilizer from soil-test results, crop stage and local recommendation, not from leaf colour alone. Yellow or pale leaves can come from nitrogen shortage but also from waterlogging, drought stress, disease, pests, salinity or other nutrient problems, so check the field pattern (whole field vs. patches, old vs. young leaves) and soil moisture first. Apply nitrogen in split doses at the right crop stage; avoid applying just before heavy rain (runoff and leaching) and avoid late top-dressing when the crop is near maturity. Apply with enough soil moisture, never touch leaves with granular fertilizer, and follow the product label and the local KVK recommendation for amounts."
+ },
+ {
+  "id": "pest-disease-decision",
+  "title": "Deciding whether to spray for pests or disease",
+  "titleHi": "कीट या रोग के लिए छिड़काव करना चाहिए या नहीं, कैसे तय करें",
+  "crop": "any",
+  "stages": [],
+  "tags": [
+   "pest",
+   "insect",
+   "bug",
+   "aphid",
+   "caterpillar",
+   "disease",
+   "fungus",
+   "blight",
+   "spot",
+   "spots",
+   "wilt",
+   "pesticide",
+   "insecticide",
+   "spray",
+   "kida",
+   "कीट",
+   "कीड़ा",
+   "कीड़े",
+   "रोग",
+   "बीमारी",
+   "धब्बे",
+   "धब्बा",
+   "फफूंद",
+   "छिड़काव",
+   "दवा",
+   "कीटनाशक",
+   "सूखना",
+   "मुरझा"
+  ],
+  "text": "Scout first: look at many plants across the field (not just one), note what is damaged (leaves, stem, grain), how many plants are affected and whether insects or spore growth are actually visible. Spots, holes or yellowing alone do not prove a pest or disease; look-alikes include nutrient shortage, water stress, herbicide or weather damage. Spray only when the problem is confirmed and widespread enough to cause real loss (the local economic threshold), and prefer the least harmful option first (removing affected plants, biological or cultural control). Confirm the problem with the local KVK or agriculture officer, and use only a product approved for that crop and problem. Follow the label for dose, protective equipment, waiting period before harvest, and spray in calm, dry weather."
+ }
+]

@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#1f6b3a" />
+<title>KRISHAK — Your Farm. Your Context. Smarter Decisions.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" /><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>" />
+<style>
+[hidden] { display: none !important; }
+:root {
+  --bg: #060b17; --bg2: #0b1426; --glass: rgba(255,255,255,.045); --glass-hi: rgba(255,255,255,.075);
+  --line: rgba(160,190,220,.16); --ink: #e8f0f2; --muted: #8fa5b3;
+  --em: #2ee59d; --em-deep: #14a56f; --cyan: #38d6ff; --amber: #ffb547; --err: #ff7a6b;
+  --radius: 18px;
+  --head: "Sora", "Noto Sans Devanagari", "Segoe UI", "Nirmala UI", system-ui, sans-serif; --body: "Inter", "Noto Sans Devanagari", "Segoe UI", "Nirmala UI", system-ui, sans-serif;
+  font-family: var(--body); color: var(--ink);
+}
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.55; font-size: 16px; min-height: 100vh; background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 500px at 82% -8%, rgba(46,229,157,.16), transparent 60%),
+    radial-gradient(700px 480px at 4% 12%, rgba(56,214,255,.10), transparent 60%),
+    linear-gradient(rgba(160,190,220,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160,190,220,.045) 1px, transparent 1px);
+  background-size: auto, auto, 44px 44px, 44px 44px; background-attachment: fixed; }
+h1, h2, h3 { font-family: var(--head); margin: 0; line-height: 1.2; color: #fff; letter-spacing: -.01em; }
+h1 { font-size: clamp(2rem, 4.6vw, 3.1rem); font-weight: 600; }
+h2 { font-size: 1.3rem; font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
+p { margin: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: -999px; background: #fff; color: #000; padding: .5rem 1rem; z-index: 50; }
+.skip:focus { left: 8px; top: 8px; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+.header { position: sticky; top: 0; z-index: 20; background: rgba(6,11,23,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.header-inner { max-width: 1120px; margin: 0 auto; padding: .8rem 1.25rem; display: flex; align-items: center; gap: 1.5rem; }
+.logo { display: flex; align-items: center; gap: .6rem; color: #fff; text-decoration: none; font-family: var(--head); font-size: 1.15rem; font-weight: 700; letter-spacing: .12em; }
+.logo svg { filter: drop-shadow(0 0 8px rgba(46,229,157,.55)); }
+.nav { display: flex; gap: .3rem; margin-left: auto; padding: .25rem; border: 1px solid var(--line); border-radius: 999px; background: var(--glass); }
+.nav a { color: var(--muted); text-decoration: none; padding: .4rem .95rem; border-radius: 999px; font-size: .92rem; transition: color .15s, background .15s; }
+.nav a:hover { color: #fff; background: var(--glass-hi); }
+.header-right { display: flex; align-items: center; gap: .6rem; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .85rem; color: #04140e; background: var(--em); box-shadow: 0 0 0 3px rgba(46,229,157,.2), 0 0 18px rgba(46,229,157,.45); }
+.menu-btn { display: none; background: none; border: 0; padding: .4rem; cursor: pointer; }
+.menu-btn span { display: block; width: 22px; height: 2px; background: #fff; margin: 5px 0; }
+
+.page { max-width: 1120px; margin: 0 auto; padding: 2.5rem 1.25rem 3rem; }
+.welcome { margin-bottom: 1.8rem; }
+.welcome > p { color: var(--muted); margin-top: .5rem; font-size: 1.08rem; }
+.status { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
+.status span { display: inline-flex; align-items: center; gap: .45rem; font-size: .82rem; color: var(--muted); border: 1px solid var(--line); background: var(--glass); border-radius: 999px; padding: .28rem .75rem; }
+.status i { width: 7px; height: 7px; border-radius: 50%; background: var(--em); box-shadow: 0 0 8px var(--em); animation: pulse 2.4s ease-in-out infinite; }
+.status i.off { background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: none; }
+@keyframes pulse { 50% { opacity: .35; } }
+
+.grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 1.25rem; align-items: start; }
+.card { position: relative; background: var(--glass); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.5rem; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 20px 50px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07); scroll-margin-top: 90px; }
+.card::before { content: ""; position: absolute; left: 24px; right: 24px; top: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--em), transparent); opacity: .7; }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: .75rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
+
+.facts { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.facts div { background: rgba(0,0,0,.22); border: 1px solid var(--line); border-radius: 12px; padding: .7rem .85rem; }
+.facts dt { font-size: .76rem; color: var(--muted); }
+.facts dd { margin: .1rem 0 0; font-weight: 600; color: #fff; }
+.facts div:first-child, .facts div:nth-child(2) { grid-column: span 2; }
+
+.btn { font: inherit; font-weight: 600; border-radius: 12px; padding: .62rem 1.15rem; cursor: pointer; border: 1px solid transparent; transition: transform .1s, box-shadow .2s, background .2s; }
+.btn.primary { background: var(--em); color: #04140e; margin-top: 1.1rem; box-shadow: 0 0 0 1px rgba(46,229,157,.4), 0 8px 26px -6px rgba(46,229,157,.55); }
+.btn.primary:hover { box-shadow: 0 0 0 1px rgba(46,229,157,.7), 0 10px 32px -4px rgba(46,229,157,.75); transform: translateY(-1px); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--em); color: var(--em); background: rgba(46,229,157,.08); }
+
+.assistant h2 { margin-bottom: 1rem; }
+
+/* Voice-first farmer controls: intentionally prominent and visible on desktop/mobile. */
+.voice-panel { margin: .8rem 0 1.1rem; padding: 1rem; border: 1px solid rgba(46,229,157,.55); border-radius: 16px; background: linear-gradient(135deg, rgba(46,229,157,.14), rgba(56,214,255,.07)); }
+.voice-panel-title { display:flex; align-items:center; gap:.55rem; font-weight:700; color:#fff; margin-bottom:.35rem; }
+.voice-panel-help { color:var(--muted); font-size:.9rem; margin-bottom:.8rem; }
+.voice-tools { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
+.voice-tools label { font-size:.9rem; font-weight:600; }
+.voice-tools select { width:auto; min-width:155px; flex:1 1 150px; }
+.btn.voice-main { background:var(--em); color:#04140e; font-size:1rem; font-weight:800; min-height:48px; border-radius:13px; box-shadow:0 0 0 1px rgba(46,229,157,.45),0 7px 22px -8px rgba(46,229,157,.6); }
+.btn.voice-main.listening { background:#ffb547; color:#1c1300; animation:pulse 1s ease-in-out infinite; }
+.photo-panel { margin: .8rem 0 1.1rem; padding: 1rem; border: 1px solid rgba(56,214,255,.5); border-radius: 16px; background: linear-gradient(135deg, rgba(56,214,255,.12), rgba(46,229,157,.06)); }
+.photo-title { display:flex; align-items:center; gap:.55rem; font-weight:700; color:#fff; margin-bottom:.35rem; }
+.photo-help { color:var(--muted); font-size:.9rem; margin-bottom:.8rem; }
+.photo-tools { display:flex; gap:.6rem; flex-wrap:wrap; }
+.btn.photo-main { background:var(--cyan); color:#02161d; font-weight:800; min-height:48px; border-radius:13px; box-shadow:0 0 0 1px rgba(56,214,255,.45),0 7px 22px -8px rgba(56,214,255,.6); }
+.photo-preview { display:flex; gap:.9rem; align-items:center; margin-top:.8rem; }
+.photo-preview img { width:96px; height:96px; object-fit:cover; border-radius:12px; border:1px solid var(--line); flex:none; }
+.photo-preview p { margin-bottom:.5rem; color:var(--ink); font-size:.9rem; }
+#photoStatus { color:#a9ecff; min-height:1.4em; margin:.65rem 0 0; font-size:.9rem; }
+#photoStatus.bad { color:var(--err); }
+.photo-result .photo-res-grid { display:grid; grid-template-columns:150px 1fr; gap:1rem; align-items:start; }
+.photo-result img { width:150px; height:150px; object-fit:cover; border-radius:12px; border:1px solid var(--line); }
+.verdicts { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:1rem; }
+.verdict { background:rgba(0,0,0,.25); border:1px solid var(--line); border-radius:12px; padding:.85rem; }
+.verdict h4 { margin:0 0 .45rem; font-family:var(--head); font-size:.98rem; color:#fff; }
+.badge { display:inline-block; font-size:.8rem; font-weight:700; border-radius:999px; padding:.15rem .7rem; margin-bottom:.45rem; border:1px solid currentColor; }
+.v-yes .badge { color:var(--amber); } .v-no .badge { color:var(--em); } .v-wait .badge { color:var(--cyan); } .v-unclear .badge { color:var(--muted); }
+@media (max-width: 680px) { .photo-result .photo-res-grid, .verdicts { grid-template-columns:1fr; } .photo-result img { width:100%; height:200px; } }
+#voiceStatus { color:#b7f5d8; min-height:1.4em; margin:.65rem 0 0; font-size:.9rem; }
+
+textarea, input, select { width: 100%; font: inherit; color: #fff; background: rgba(0,0,0,.32); border: 1px solid var(--line); border-radius: 12px; padding: .7rem .85rem; color-scheme: dark; }
+textarea::placeholder, input::placeholder { color: #6f8493; }
+textarea { resize: vertical; min-height: 92px; }
+textarea:focus, input:focus, select:focus { outline: none; border-color: var(--em); box-shadow: 0 0 0 3px rgba(46,229,157,.18); }
+[aria-invalid="true"] { border-color: var(--err); }
+.error { color: var(--err); font-size: .9rem; margin-top: .45rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; }
+.chip { font: inherit; font-size: .88rem; color: var(--ink); background: var(--glass); border: 1px solid var(--line); border-radius: 999px; padding: .42rem .9rem; cursor: pointer; transition: border-color .15s, background .15s, color .15s; }
+.chip:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(56,214,255,.08); }
+
+.result { margin-top: 1.25rem; }
+.banner { background: rgba(255,181,71,.1); color: #ffd18a; border: 1px solid rgba(255,181,71,.35); border-radius: 12px; padding: .8rem 1rem; margin-bottom: 1.1rem; font-size: .93rem; }
+.asked { color: var(--muted); margin: .45rem 0 1.2rem; }
+.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.block { background: rgba(0,0,0,.22); border: 1px solid var(--line); border-radius: 14px; padding: 1.05rem; }
+.block.wide { grid-column: span 2; }
+.small { font-size: .84rem; color: var(--muted); margin-top: .5rem; }
+.unavailable { color: var(--muted); font-size: .94rem; }
+.tag { display: inline-block; font-size: .75rem; font-weight: 600; color: var(--amber); border: 1px dashed rgba(255,181,71,.55); border-radius: 6px; padding: .05rem .45rem; margin-right: .35rem; }
+.plain { list-style: none; margin: .55rem 0 0; padding: 0; display: grid; gap: .3rem; font-size: .93rem; }
+.plain span { display: inline-block; min-width: 5.5rem; color: var(--muted); }
+
+.overlay { position: fixed; inset: 0; background: rgba(3,7,16,.72); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 1rem; z-index: 40; animation: fade .15s ease-out; }
+.modal { background: #0d1830; border: 1px solid var(--line); border-radius: 20px; width: min(580px, 100%); max-height: 92vh; overflow: auto; padding: 1.6rem; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(46,229,157,.12); animation: pop .18s ease-out; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem 1rem; margin: 1.2rem 0; }
+.field label { display: block; font-size: .85rem; font-weight: 600; color: var(--muted); margin-bottom: .3rem; }
+.field:nth-child(1), .field:nth-child(2) { grid-column: span 2; }
+.actions { display: flex; justify-content: flex-end; gap: .6rem; }
+.actions .btn.primary { margin-top: 0; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+
+.footer { text-align: center; color: var(--muted); font-size: .84rem; padding: 1.6rem 1rem 2.2rem; border-top: 1px solid var(--line); }
+
+.mandi { margin-top: 1.25rem; }
+.mandi-controls { display:grid; grid-template-columns: 1fr 1fr auto; gap:.7rem; align-items:end; margin:.9rem 0 1.1rem; }
+.mandi-controls label { display:block; font-size:.85rem; font-weight:600; color:var(--muted); margin-bottom:.3rem; }
+.mandi-controls .btn.primary { margin-top:0; height:46px; }
+.mstats { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin:0 0 1rem; }
+.mstat { background:rgba(0,0,0,.25); border:1px solid var(--line); border-radius:12px; padding:.75rem .9rem; }
+.mstat dt { font-size:.76rem; color:var(--muted); } .mstat dd { margin:.15rem 0 0; font-family:var(--head); font-size:1.25rem; font-weight:600; color:#fff; }
+.mstat dd small { display:block; font-family:var(--body); font-size:.78rem; font-weight:400; color:var(--muted); }
+.mtable-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:14px; }
+.mtable { width:100%; border-collapse:collapse; font-size:.93rem; min-width:560px; }
+.mtable th, .mtable td { text-align:left; padding:.6rem .8rem; border-bottom:1px solid var(--line); white-space:nowrap; }
+.mtable th { font-size:.78rem; color:var(--muted); font-weight:600; background:rgba(0,0,0,.2); }
+.mtable td.num, .mtable th.num { text-align:right; font-variant-numeric:tabular-nums; }
+.mtable tr:last-child td { border-bottom:0; }
+.mtable td.mprice { color:#fff; font-weight:700; }
+.mtable tr.near { background:rgba(46,229,157,.07); }
+.badge-near { display:inline-block; font-size:.72rem; font-weight:700; color:var(--em); border:1px solid currentColor; border-radius:999px; padding:0 .5rem; margin-left:.4rem; }
+@media (max-width: 680px) { .mandi-controls, .mstats { grid-template-columns:1fr; } }
+@media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 680px) {
+  .menu-btn { display: block; }
+  .header-inner { flex-wrap: wrap; gap: .5rem; }
+  .header-right { margin-left: auto; }
+  .nav { display: none; flex-direction: column; width: 100%; order: 3; margin: 0; border-radius: 16px; }
+  .nav.open { display: flex; }
+  .result-grid, .form-grid, .facts { grid-template-columns: 1fr; }
+  .block.wide, .field:nth-child(1), .field:nth-child(2), .facts div:first-child, .facts div:nth-child(2) { grid-column: auto; }
+  .card { padding: 1.15rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+.loading { display:flex; align-items:center; gap:.8rem; color:var(--muted); padding:.5rem 0; }
+.spin { width:18px; height:18px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--em); animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.list { margin:.2rem 0 0; padding-left:1.1rem; display:grid; gap:.35rem; }
+.action { font-size:1.12rem; color:#fff; font-weight:500; }
+.note { background:rgba(46,229,157,.08); border:1px solid rgba(46,229,157,.3); color:#9ff0cc; border-radius:12px; padding:.7rem 1rem; margin-bottom:1.1rem; font-size:.92rem; }
+.block.warn { border-color:rgba(255,181,71,.35); }
+.btn[disabled] { opacity:.55; cursor:progress; }
+.status em { font-style: normal; }
+.lang { display: inline-flex; padding: .2rem; gap: .15rem; border: 1px solid var(--line); border-radius: 999px; background: var(--glass); }
+.lang-btn { font: inherit; font-size: .85rem; font-weight: 600; color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: .32rem .8rem; cursor: pointer; transition: color .15s, background .15s; }
+.lang-btn:hover { color: #fff; background: var(--glass-hi); }
+.lang-btn.on { color: #04140e; background: var(--em); box-shadow: 0 0 14px -2px rgba(46,229,157,.55); }
+/* Devanagari: no negative tracking (it breaks conjuncts) and a little more line height for the matras. */
+html[lang="hi"] body { line-height: 1.7; }
+html[lang="hi"] h1, html[lang="hi"] h2, html[lang="hi"] h3, html[lang="hi"] .logo { letter-spacing: 0; }
+html[lang="hi"] h1, html[lang="hi"] h2, html[lang="hi"] h3 { line-height: 1.35; }
+@media (max-width: 420px) { .lang-btn { padding: .3rem .6rem; font-size: .8rem; } .header-inner { padding-left: .9rem; padding-right: .9rem; } .logo { letter-spacing: .06em; } }
+
+/* KRISHAK-LAYOUT-V2: bento dashboard layout (appended last so it overrides the earlier layout rules) */
+.page { max-width: 1240px; padding-top: 1.75rem; }
+.welcome { position: relative; overflow: hidden; margin-bottom: 1.25rem; padding: 2.2rem 2rem 1.9rem; border: 1px solid var(--line); border-radius: 28px;
+  background: linear-gradient(120deg, rgba(46,229,157,.13), rgba(56,214,255,.05) 55%, rgba(6,11,23,0) 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 30px 70px -40px rgba(0,0,0,.8); }
+/* furrow lines: ploughed-field rows fading in from the right, the one decorative element on the page */
+.welcome::after { content: ""; position: absolute; inset: 0 0 0 38%; pointer-events: none; opacity: .9;
+  background: repeating-linear-gradient(112deg, transparent 0 16px, rgba(46,229,157,.16) 16px 17px);
+  -webkit-mask-image: radial-gradient(ellipse at 85% 40%, #000 0%, transparent 68%); mask-image: radial-gradient(ellipse at 85% 40%, #000 0%, transparent 68%); }
+.welcome > * { position: relative; z-index: 1; }
+.welcome h1 { font-size: clamp(2.2rem, 5.2vw, 3.8rem); line-height: 1.08; }
+.welcome > p { max-width: 38rem; font-size: 1.12rem; }
+.status { margin-top: 1.4rem; }
+
+.grid { grid-template-columns: minmax(290px, 360px) minmax(0, 1fr); gap: 1.25rem; }
+#farm { position: sticky; top: 84px; border-radius: 22px; background: linear-gradient(180deg, rgba(46,229,157,.08), var(--glass) 45%); }
+#farm .facts { gap: .65rem; }
+#farm .facts dd { font-size: 1.02rem; }
+#farm .facts div:first-child dd { font-family: var(--head); font-size: 1.25rem; }
+
+.assistant { border-radius: 22px; padding: 1.6rem; }
+#askForm { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: stretch; }
+#askForm .voice-panel, #askForm .photo-panel { margin: 0; display: flex; flex-direction: column; border-radius: 18px; }
+#askForm .voice-tools, #askForm .photo-tools { margin-top: auto; }
+#askForm .voice-tools select { flex: 1 1 100%; }
+#askForm textarea, #askForm #qerr, #askForm .chips, #askForm .btn.primary { grid-column: 1 / -1; margin-top: 0; }
+#askForm textarea { min-height: 110px; font-size: 1.02rem; }
+#askForm .btn.primary { justify-self: start; padding: .8rem 1.8rem; font-size: 1.02rem; }
+
+.result, .mandi { margin-top: 1.25rem; border-radius: 22px; }
+.mandi { background: linear-gradient(180deg, rgba(56,214,255,.06), var(--glass) 40%); }
+.mstat dd { font-size: 1.6rem; }
+.mstat:first-child { border-color: rgba(46,229,157,.45); background: rgba(46,229,157,.08); }
+
+.header-inner { max-width: 1240px; }
+.mandi-controls input, .mandi-controls select { height: 46px; }
+
+/* KRISHAK-THEME-FIELD: sunlit-field palette. Leaf green #1f6b3a (primary), sprout #4caf50, wheat gold #e5a00d, sky #dff1f7, soil ink #2b2217, mist #f3f8ee */
+:root { --bg:#f3f8ee; --bg2:#e8f1df; --glass:#ffffff; --glass-hi:#eef5e4; --line:rgba(60,90,40,.2); --ink:#2b2217; --muted:#6b6050;
+  --em:#2e8b3d; --em-deep:#1f6b3a; --cyan:#1b79a6; --amber:#d98a00; --err:#c0392b; }
+body { font-size: 17.5px; color: var(--ink); background-color: var(--bg);
+  background-image: radial-gradient(700px 380px at 88% -4%, rgba(229,160,13,.28), transparent 65%), linear-gradient(180deg, #d9eff6 0, #eaf5ef 340px, #f3f8ee 640px); background-attachment: scroll; }
+h1, h2, h3, .logo { color: var(--em-deep); }
+.header { background: rgba(255,255,255,.88); box-shadow: 0 6px 24px -16px rgba(31,107,58,.5); }
+.nav a { color: #4a5a3c; font-weight: 500; } .nav a:hover { color: var(--em-deep); background: #e3f0d8; }
+.logo svg { filter: none; } .logo svg path { fill: #2e8b3d; stroke: #2e8b3d; } .logo svg path:nth-of-type(3) { fill: #e5a00d; }
+.avatar { color: #fff; background: var(--em-deep); box-shadow: 0 0 0 3px rgba(46,139,61,.25); }
+.menu-btn span { background: var(--em-deep); }
+.lang-btn { color: #4a5a3c; } .lang-btn:hover { color: var(--em-deep); background: #e3f0d8; } .lang-btn.on { color: #fff; background: var(--em-deep); box-shadow: none; }
+.welcome { background: linear-gradient(115deg, #ffffff 0%, #f5faea 45%, #fdf1cf 100%); border-color: rgba(229,160,13,.35); box-shadow: 0 24px 50px -32px rgba(31,107,58,.55); }
+.welcome::after { background: repeating-linear-gradient(112deg, transparent 0 16px, rgba(46,139,61,.2) 16px 17px); }
+.welcome h1 { color: var(--em-deep); } .welcome h1::before { content: "🌾 "; }
+.welcome > p { color: #5b5040; }
+.status span { background: #fff; color: #4a5a3c; } .status i { background: #2e8b3d; box-shadow: 0 0 6px #2e8b3d; } .status i.off { background: #e5a00d; box-shadow: 0 0 6px #e5a00d; }
+.card { background: #fff; box-shadow: 0 14px 34px -22px rgba(31,107,58,.45); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.card::before { background: linear-gradient(90deg, transparent, #e5a00d, transparent); opacity: .8; }
+#farm { background: linear-gradient(180deg, #eaf6e1, #fff 50%); }
+.mandi { background: linear-gradient(180deg, #fdf3d6, #fff 45%); }
+#farm h2::before { content: "🏡 "; } .assistant h2::before { content: "🧑‍🌾 "; } #mandiH::before { content: "💰 "; } .result h2::before { content: "✅ "; }
+.facts div, .block, .verdict, .mstat { background: #f6faef; border-color: var(--line); }
+.facts dd, .action, .verdict h4, .mstat dd, .mtable td.mprice, .photo-title, .voice-panel-title { color: var(--ink); }
+.mstat:first-child { background: #e4f4df; border-color: rgba(46,139,61,.5); }
+.btn { min-height: 52px; font-size: 1.02rem; border-radius: 14px; }
+.btn.primary { background: var(--em-deep); color: #fff; box-shadow: 0 8px 20px -8px rgba(31,107,58,.7); } .btn.primary:hover { box-shadow: 0 10px 26px -6px rgba(31,107,58,.85); }
+.btn.ghost { color: var(--em-deep); border-color: rgba(31,107,58,.35); background: #fff; } .btn.ghost:hover { color: var(--em-deep); border-color: var(--em-deep); background: #eef7e6; }
+.btn.voice-main { background: var(--em-deep); color: #fff; box-shadow: 0 8px 20px -8px rgba(31,107,58,.7); } .btn.voice-main.listening { background: #e5a00d; color: #2b1c00; }
+.btn.photo-main { background: #e5a00d; color: #2b1c00; box-shadow: 0 8px 20px -8px rgba(229,160,13,.8); }
+.voice-panel { background: linear-gradient(135deg, #e6f4de, #f4faee); border-color: rgba(46,139,61,.5); }
+.photo-panel { background: linear-gradient(135deg, #fdf0cc, #fff8e6); border-color: rgba(229,160,13,.6); }
+.voice-panel-help, .photo-help { color: #5b5040; } #voiceStatus { color: var(--em-deep); } #photoStatus { color: #8a5a00; }
+textarea, input, select { color: var(--ink); background: #fff; border: 1.5px solid rgba(60,90,40,.3); color-scheme: light; font-size: 1.02rem; }
+textarea::placeholder, input::placeholder { color: #8d8470; }
+textarea:focus, input:focus, select:focus { border-color: var(--em); box-shadow: 0 0 0 4px rgba(46,139,61,.18); }
+.chip { background: #fff; color: var(--em-deep); border-color: rgba(31,107,58,.3); font-size: .95rem; } .chip:hover { background: #fdf3d6; color: #6b4600; border-color: #e5a00d; }
+.note { background: #e8f5e1; border-color: rgba(46,139,61,.4); color: #1f5a2f; }
+.banner { background: #fff3d6; border-color: rgba(229,160,13,.6); color: #6b4600; }
+.tag { color: #8a5a00; } .error { color: var(--err); }
+.mtable th { background: #eef5e4; color: #5b5040; } .mtable tr.near { background: #e8f5e1; } .badge-near { color: var(--em-deep); background: #fff; }
+.mtable td { color: var(--ink); }
+.v-yes .badge { color: #9a6200; } .v-no .badge { color: #1f6b3a; } .v-wait .badge { color: #1b79a6; }
+.overlay { background: rgba(31,45,25,.55); } .modal { background: #fff; border-color: var(--line); box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+.field label, .mandi-controls label { color: #4a5a3c; }
+.footer { color: #5b5040; background: #e8f1df; }
+.skip { background: #fff; }
+:focus-visible { outline-color: #1b79a6; }
+@media (max-width: 1020px) { .grid { grid-template-columns: 1fr; } #farm { position: static; } #farm .facts { grid-template-columns: repeat(4, 1fr); } #farm .facts div:first-child, #farm .facts div:nth-child(2) { grid-column: span 2; } }
+@media (max-width: 860px) { #askForm { grid-template-columns: 1fr; } #farm .facts { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 680px) { .welcome { padding: 1.5rem 1.15rem; border-radius: 22px; } .welcome::after { inset: 0; opacity: .5; } #farm .facts { grid-template-columns: 1fr; } #farm .facts div:first-child, #farm .facts div:nth-child(2) { grid-column: auto; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+<header class="header" id="top"><div class="header-inner">
+  <a class="logo" href="#top" aria-label="KRISHAK home" data-i18n-aria="logo.aria">
+    <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 29V13" stroke="#8fd16b" stroke-width="2.4" stroke-linecap="round"/><path d="M16 15c-5 0-8-3-8-8 5 0 8 3 8 8Z" fill="#8fd16b"/><path d="M16 19c5 0 8-3 8-8-5 0-8 3-8 8Z" fill="#cfeab8"/><path d="M16 25c-4 0-6.5-2.5-6.5-6.5 4 0 6.5 2.5 6.5 6.5Z" fill="#8fd16b"/></svg>
+    <span>KRISHAK</span></a>
+  <nav class="nav" id="nav" aria-label="Main" data-i18n-aria="nav.aria"><a href="#top" data-i18n="nav.dashboard">Dashboard</a><a href="#farm" data-i18n="nav.farm">My Farm</a><a href="#assistant" data-i18n="nav.assistant">AI Assistant</a><a href="#mandi" data-i18n="nav.mandi">Mandi Prices</a></nav>
+  <div class="header-right"><div class="lang" role="group" aria-label="Language" data-i18n-aria="lang.aria"><button type="button" class="lang-btn on" data-lang="en" lang="en" aria-pressed="true">English</button><button type="button" class="lang-btn" data-lang="hi" lang="hi" aria-pressed="false">हिन्दी</button></div><div class="avatar" id="avatar"></div>
+    <button class="menu-btn" id="menu" aria-label="Toggle menu" data-i18n-aria="menu.aria" aria-expanded="false"><span></span><span></span><span></span></button></div>
+</div></header>
+<main id="main" class="page">
+  <section class="welcome"><h1 id="hello"></h1><p data-i18n="welcome.sub">Let's make an informed decision for your farm today.</p>
+    <div class="status" aria-label="System status" data-i18n-aria="status.aria"><span><i></i><em data-i18n="status.dash">Dashboard live</em></span><span id="st-ai"><i class="off"></i><em data-i18n="ai.checking">AI engine: checking…</em></span><span id="st-wx"><i class="off"></i><em data-i18n="wx.checking">Weather: checking…</em></span><span id="st-mandi"><i class="off"></i><em data-i18n="mandi.st.checking">Mandi prices: checking…</em></span></div></section>
+  <div class="grid">
+    <section class="card" id="farm"><div class="card-head"><h2 data-i18n="farm.title">My Farm</h2><button class="btn ghost" id="edit" data-i18n="farm.edit">Edit Farm Profile</button></div><dl class="facts" id="facts"></dl></section>
+    <section class="card assistant" id="assistant"><h2 data-i18n="ask.title">How can I help with your farm?</h2>
+      <form id="askForm" novalidate>
+        <label for="q" class="sr" data-i18n="ask.label">Your question</label>
+        <div class="voice-panel" aria-label="Ask KRISHAK by voice">
+          <div class="voice-panel-title"><span aria-hidden="true">🎙️</span> <span>ASK YOUR FARM PROBLEM BY VOICE</span></div>
+          <p class="voice-panel-help">Choose your language, press the microphone, and speak naturally. KRISHAK will transcribe your question and send it to the AI for advice automatically.</p>
+          <div class="voice-tools">
+            <label for="voiceLang">Speak and answer in</label>
+            <select id="voiceLang" aria-label="Choose voice and answer language">
+              <option value="en">English</option><option value="hi">हिन्दी (Hindi)</option><option value="pa">ਪੰਜਾਬੀ (Punjabi)</option><option value="ta">தமிழ் (Tamil)</option><option value="te">తెలుగు (Telugu)</option>
+            </select>
+            <button type="button" class="btn voice-main" id="voiceInput">🎙️ Tap to Speak</button>
+            <button type="button" class="btn ghost" id="voiceStop">■ Stop</button>
+          </div>
+          <p id="voiceStatus" role="status" aria-live="polite">Ready. Choose a language and tap “Tap to Speak”.</p>
+        </div>
+        <div class="photo-panel" role="group" aria-label="Crop photo check" data-i18n-aria="photo.aria">
+          <div class="photo-title"><span aria-hidden="true">📷</span> <span data-i18n="photo.title">CHECK YOUR CROP WITH A PHOTO</span></div>
+          <p class="photo-help" data-i18n="photo.help">Take a clear, close picture of the leaves or the affected part of your crop. Then ask if you should use fertilizer or pesticide. The photo is sent to the AI service to answer your question and is not saved by KRISHAK.</p>
+          <div class="photo-tools">
+            <button type="button" class="btn photo-main" id="photoCam" data-i18n="photo.take">📷 Take photo</button>
+            <button type="button" class="btn ghost" id="photoPick" data-i18n="photo.choose">🖼️ Choose photo</button>
+          </div>
+          <input type="file" id="photoCamIn" accept="image/*" capture="environment" hidden>
+          <input type="file" id="photoPickIn" accept="image/*" hidden>
+          <div class="photo-preview" id="photoPrev" hidden><img id="photoImg" alt="Your crop photo"><div><p id="photoName"></p><button type="button" class="btn ghost" id="photoRemove" data-i18n="photo.remove">Remove photo</button></div></div>
+          <p id="photoStatus" role="status" aria-live="polite"></p>
+        </div>
+        <textarea id="q" rows="3" maxlength="300" placeholder="Ask about spraying, irrigation, or what to do next…" data-i18n-placeholder="ask.placeholder"></textarea>
+        <p id="qerr" class="error" role="alert" hidden></p>
+        <div class="chips" id="chips"></div>
+        <button type="submit" class="btn primary" data-i18n="ask.submit">Ask KRISHAK</button>
+      </form></section>
+  </div>
+  <section class="card result" id="result" tabindex="-1" hidden></section>
+  <section class="card mandi" id="mandi" aria-labelledby="mandiH">
+    <h2 id="mandiH" data-i18n="mandi.title">Mandi Prices</h2>
+    <p class="small" style="margin-top:.4rem" data-i18n="mandi.sub">Wholesale prices reported by mandis (Agmarknet, Government of India). Check them before you sell.</p>
+    <div class="mandi-controls">
+      <div><label for="mCrop" data-i18n="mandi.crop">Crop</label><input id="mCrop" maxlength="40"></div>
+      <div><label for="mState" data-i18n="mandi.state">State</label><select id="mState"></select></div>
+      <button type="button" class="btn primary" id="mGo" data-i18n="mandi.go">Show prices</button>
+    </div>
+    <div id="mandiBody" role="region" aria-live="polite"></div>
+  </section>
+</main>
+<footer class="footer" data-i18n="footer">KRISHAK · Your Farm. Your Context. Smarter Decisions.</footer>
+<div id="lang-live" class="sr" role="status" aria-live="polite"></div>
+<div class="overlay" id="overlay" hidden><form class="modal" id="pform" role="dialog" aria-modal="true" aria-labelledby="mh" novalidate></form></div>
+<script>
+/* ===== KRISHAK translations (English + Hindi). Add a key to BOTH languages. =====
+   Only display text lives here. Stored values (crop stage "Vegetative", soil "Loamy", irrigation "Available")
+   and everything sent to the server stay in English; the labels below are what the farmer sees. */
+const I18N = {
+en: {
+  "app.title": "KRISHAK — Your Farm. Your Context. Smarter Decisions.",
+  "app.tagline": "Your Farm. Your Context. Smarter Decisions.",
+  "skip": "Skip to content",
+  "logo.aria": "KRISHAK home",
+  "nav.aria": "Main",
+  "nav.dashboard": "Dashboard", "nav.farm": "My Farm", "nav.assistant": "AI Assistant",
+  "menu.aria": "Toggle menu",
+  "lang.aria": "Language",
+  "lang.switched": "Language changed to English",
+  "welcome.sub": "Let's make an informed decision for your farm today.",
+  "status.aria": "System status",
+  "status.dash": "Dashboard live",
+  "ai.bad": "AI engine: key problem", "ai.checking": "AI engine: checking…", "ai.connected": "AI engine: connected", "ai.nokey": "AI engine: add an API key", "ai.down": "AI engine: server not running",
+  "wx.checking": "Weather: checking…", "wx.live": "Weather: live on each question", "wx.down": "Weather: server not running",
+  "greet.morning": "Good morning", "greet.afternoon": "Good afternoon", "greet.evening": "Good evening", "greet.farmer": "Farmer",
+  "farm.title": "My Farm", "farm.edit": "Edit Farm Profile",
+  "fact.farmer": "Farmer", "fact.location": "Location", "fact.crop": "Crop", "fact.stage": "Crop stage", "fact.size": "Farm size", "fact.soil": "Soil type", "fact.irrigation": "Irrigation",
+  "size.one": "{n} acre", "size.many": "{n} acres",
+  "ask.title": "How can I help with your farm?",
+  "ask.label": "Your question",
+  "ask.placeholder": "Ask about spraying, irrigation, or what to do next…",
+  "ask.submit": "Ask KRISHAK",
+  "chip.spray": "Should I spray my wheat today?", "chip.irrigate": "Should I irrigate my field?", "chip.stage": "What should I do at my current crop stage?",
+  "err.question": "Type a question about your farm first (at least a few words).",
+  "loading": "Reading your farm profile, checking local weather and consulting crop notes…",
+  "note.strong": "AI-generated guidance.", "note.body": "It can be wrong. Check with your local KVK or agriculture officer before spraying or making costly decisions.",
+  "res.title": "Recommendation", "res.asked": "Your question: “{q}”",
+  "res.action": "Recommended action", "res.why": "Why this recommendation", "res.profile": "Farmer profile considered",
+  "res.knowledge": "Agricultural knowledge considered", "res.external": "External data considered",
+  "res.uncertainty": "Uncertainty and what to verify", "res.sources": "Sources and freshness",
+  "prof.location": "Location", "prof.crop": "Crop", "prof.size": "Farm size", "prof.soil": "Soil", "prof.irrigation": "Irrigation",
+  "tag.unavailable": "Unavailable", "res.nothing": "Nothing returned.", "res.nonotes": "No matching notes found.",
+  "kb.source": "KRISHAK starter notes (general agronomy, not an official advisory)",
+  "wx.now": "{place} · now {t}°C, humidity {h}%, wind {w} km/h",
+  "wx.day": "{min}–{max}°C · rain {rain} mm ({pct}%) · wind ≤{wind} km/h",
+  "wx.fail": "Live weather could not be retrieved{reason}. The AI was told it was missing.",
+  "wx.r.not_found": "could not find “{place}” on the map", "wx.r.no_data": "the weather service returned no data", "wx.r.unavailable": "the weather service could not be reached",
+  "wx.used": "Used by AI: {s}",
+  "src.profile": "Farmer profile: saved on this device", "src.kb": "Knowledge: starter notes (not an official advisory)",
+  "src.weather": "Weather: {source}, retrieved {time}", "src.noweather": "Weather: not retrieved", "src.model": "AI model: {model}, generated {time}",
+  "stale.en": "This answer was written in English.", "stale.hi": "This answer was written in Hindi.",
+  "stale.btn": "Get this answer in English",
+  "e.banner": "No recommendation was generated.",
+  "e.offline": "Start the AI engine: open a terminal in the <code>server</code> folder and run <code>npm start</code>. See README.txt.",
+  "e.unreachable": "Could not reach the AI engine on this computer.",
+  "e.generic": "The AI engine returned an error.",
+  "e.bad_request": "Please send a question and a complete farm profile.",
+  "e.no_key": "AI key missing. Restart start-krishak.bat and paste a key (Anthropic sk-ant-... or free Gemini AIza...).",
+  "e.too_large": "Request too large.",
+  "e.origin": "Origin not allowed.",
+  "e.not_found": "Not found.",
+  "e.ai_format": "The AI reply was not in the expected format. Please try again.",
+  "e.ai_timeout": "The AI took too long or the connection failed ({detail}). Google may be busy; please try again in a minute.",
+  "e.ai_key": "Google rejected this key ({detail}). Try creating a new key in a NEW project at aistudio.google.com, or use an Anthropic key instead.",
+  "e.ai_error": "The AI service returned an error: {detail}",
+  "modal.title": "Edit Farm Profile",
+  "f.name": "Name", "f.loc": "Location", "f.crop": "Crop", "f.stage": "Crop growth stage", "f.size": "Farm size (acres)", "f.soil": "Soil type", "f.irr": "Irrigation",
+  "btn.cancel": "Cancel", "btn.save": "Save changes",
+  "v.name": "Enter the farmer's name.", "v.loc": "Enter a village, town or district.", "v.crop": "Enter the crop you are growing.", "v.size": "Enter a farm size greater than 0 acres.",
+  "stage.Sowing": "Sowing", "stage.Germination": "Germination", "stage.Vegetative": "Vegetative", "stage.Flowering": "Flowering", "stage.Grain filling": "Grain filling", "stage.Maturity": "Maturity", "stage.Harvest": "Harvest",
+  "soil.Loamy": "Loamy", "soil.Sandy": "Sandy", "soil.Clay": "Clay", "soil.Silt": "Silt", "soil.Sandy loam": "Sandy loam", "soil.Clay loam": "Clay loam", "soil.Black (regur)": "Black (regur)", "soil.Red": "Red",
+  "irr.Available": "Available", "irr.Limited": "Limited", "irr.Not available": "Not available",
+  "photo.aria": "Crop photo check", "photo.title": "CHECK YOUR CROP WITH A PHOTO",
+  "photo.help": "Take a clear, close picture of the leaves or the affected part of your crop. Then ask if you should use fertilizer or pesticide. The photo is sent to the AI service to answer your question and is not saved by KRISHAK.",
+  "photo.take": "📷 Take photo", "photo.choose": "🖼️ Choose photo", "photo.remove": "Remove photo", "photo.alt": "Your crop photo",
+  "photo.processing": "Preparing your photo…", "photo.ready": "Photo ready. Type or speak your question, or tap “Ask KRISHAK”.",
+  "photo.err.type": "That file is not a picture. Please choose a photo (JPEG, PNG or WebP).", "photo.err.read": "This photo could not be opened. Please try another photo or take a new one.",
+  "photo.chip": "Should I use fertilizer or pesticide on this crop?", "photo.defaultq": "Should I use fertilizer or pesticide on this crop?",
+  "photo.res.title": "Crop photo check", "photo.res.seen": "Crop seen: {c}", "photo.res.fert": "Fertilizer", "photo.res.pest": "Pesticide",
+  "photo.poor": "The photo is not clear enough to judge. Please take a close, well-lit, in-focus picture of the affected leaves and ask again.",
+  "photo.v.yes": "Likely needed", "photo.v.no": "Not needed now", "photo.v.wait": "Wait / check first", "photo.v.unclear": "Cannot tell from photo",
+  "photo.disclaimer": "A photo cannot confirm a disease or a nutrient shortage. Check with your local KVK or agriculture officer before buying or spraying chemicals.",
+  "photo.loading": "Looking at your crop photo, checking local weather and consulting crop notes…",
+  "e.bad_image": "The photo could not be read. Please use a JPEG, PNG or WebP picture.", "e.image_too_large": "The photo is too large. Please take a smaller picture.",
+  "nav.mandi": "Mandi Prices",
+  "mandi.title": "Mandi Prices", "mandi.sub": "Wholesale prices reported by mandis (Agmarknet, Government of India). Check them before you sell.",
+  "mandi.crop": "Crop", "mandi.state": "State", "mandi.go": "Show prices", "mandi.pick": "Choose your state", "mandi.pickmsg": "Choose your state above to see mandi prices.",
+  "mandi.loading": "Fetching the latest mandi prices…",
+  "mandi.nokey": "Mandi prices need a free data.gov.in API key. Sign up at data.gov.in, copy the key from My Account, then paste it when start-krishak.bat asks (or set DATA_GOV_API_KEY in server/.env) and restart.",
+  "mandi.norecords": "No recent prices were reported for {crop} in {state}. Try another crop name or state, or check again later.",
+  "mandi.avg": "Average modal price", "mandi.high": "Highest modal price", "mandi.low": "Lowest modal price", "mandi.nmandis": "across {n} mandis", "mandi.at": "at {m}",
+  "mandi.col.market": "Mandi", "mandi.col.variety": "Variety", "mandi.col.min": "Min", "mandi.col.max": "Max", "mandi.col.modal": "Modal", "mandi.col.date": "Date",
+  "mandi.unit": "Prices are in ₹ per quintal (100 kg). “Modal” is the most common price of the day.", "mandi.near": "Near you", "mandi.perkg": "≈ ₹{kg} per kg",
+  "mandi.src": "Source: {source}. Newest price date: {date}. Fetched: {time}.",
+  "mandi.disclaimer": "These are wholesale mandi prices. They can be a day or more old, and the price you actually get depends on quality, variety and fees. Confirm at your mandi before you sell.",
+  "mandi.st.checking": "Mandi prices: checking…", "mandi.st.on": "Mandi prices: ready", "mandi.st.nokey": "Mandi prices: add data.gov.in key", "mandi.st.down": "Mandi prices: server not running",
+  "e.no_mandi_key": "Mandi prices need a free data.gov.in API key. See README.txt.",
+  "e.mandi_key": "data.gov.in rejected the API key ({detail}). Please check the key.",
+  "e.mandi_error": "The mandi price service returned an error: {detail}", "e.mandi_timeout": "The mandi price service took too long or could not be reached. Please try again.",
+  "footer": "KRISHAK · Your Farm. Your Context. Smarter Decisions."
+},
+hi: {
+  "app.title": "KRISHAK — आपका खेत। आपकी परिस्थिति। समझदार फ़ैसले।",
+  "app.tagline": "आपका खेत। आपकी परिस्थिति। समझदार फ़ैसले।",
+  "skip": "मुख्य सामग्री पर जाएँ",
+  "logo.aria": "KRISHAK होम",
+  "nav.aria": "मुख्य मेनू",
+  "nav.dashboard": "डैशबोर्ड", "nav.farm": "मेरा खेत", "nav.assistant": "एआई सहायक",
+  "menu.aria": "मेनू खोलें/बंद करें",
+  "lang.aria": "भाषा",
+  "lang.switched": "भाषा हिन्दी में बदल दी गई",
+  "welcome.sub": "आइए, आज आपके खेत के लिए सोच-समझकर फ़ैसला लें।",
+  "status.aria": "सिस्टम की स्थिति",
+  "status.dash": "डैशबोर्ड चालू है",
+  "ai.bad": "एआई इंजन: कुंजी में समस्या", "ai.checking": "एआई इंजन: जाँच हो रही है…", "ai.connected": "एआई इंजन: जुड़ा हुआ है", "ai.nokey": "एआई इंजन: एपीआई कुंजी (API key) जोड़ें", "ai.down": "एआई इंजन: सर्वर चालू नहीं है",
+  "wx.checking": "मौसम: जाँच हो रही है…", "wx.live": "मौसम: हर सवाल पर ताज़ा जानकारी", "wx.down": "मौसम: सर्वर चालू नहीं है",
+  "greet.morning": "सुप्रभात", "greet.afternoon": "नमस्कार", "greet.evening": "शुभ संध्या", "greet.farmer": "किसान भाई",
+  "farm.title": "मेरा खेत", "farm.edit": "खेत की जानकारी बदलें",
+  "fact.farmer": "किसान", "fact.location": "स्थान", "fact.crop": "फ़सल", "fact.stage": "फ़सल की अवस्था", "fact.size": "खेत का आकार", "fact.soil": "मिट्टी का प्रकार", "fact.irrigation": "सिंचाई",
+  "size.one": "{n} एकड़", "size.many": "{n} एकड़",
+  "ask.title": "आपके खेत के लिए मैं कैसे मदद करूँ?",
+  "ask.label": "आपका सवाल",
+  "ask.placeholder": "छिड़काव, सिंचाई या आगे क्या करना है, इसके बारे में पूछें…",
+  "ask.submit": "KRISHAK से पूछें",
+  "chip.spray": "क्या मुझे आज अपनी गेहूँ की फ़सल पर छिड़काव करना चाहिए?", "chip.irrigate": "क्या मुझे अपने खेत में सिंचाई करनी चाहिए?", "chip.stage": "मेरी फ़सल की मौजूदा अवस्था में मुझे क्या करना चाहिए?",
+  "err.question": "पहले अपने खेत के बारे में सवाल लिखें (कम से कम कुछ शब्द)।",
+  "loading": "आपके खेत की जानकारी पढ़ी जा रही है, स्थानीय मौसम देखा जा रहा है और फ़सल के नोट्स देखे जा रहे हैं…",
+  "note.strong": "एआई द्वारा बनाई गई सलाह।", "note.body": "यह गलत भी हो सकती है। छिड़काव करने या कोई महँगा फ़ैसला लेने से पहले अपने नज़दीकी कृषि विज्ञान केंद्र (KVK) या कृषि अधिकारी से पूछ लें।",
+  "res.title": "सलाह", "res.asked": "आपका सवाल: “{q}”",
+  "res.action": "सुझाया गया कदम", "res.why": "यह सलाह क्यों", "res.profile": "किसान की जानकारी जो ध्यान में रखी गई",
+  "res.knowledge": "कृषि ज्ञान जो ध्यान में रखा गया", "res.external": "बाहरी जानकारी जो ध्यान में रखी गई",
+  "res.uncertainty": "अनिश्चितता और क्या जाँचना है", "res.sources": "स्रोत और जानकारी कितनी ताज़ा है",
+  "prof.location": "स्थान", "prof.crop": "फ़सल", "prof.size": "खेत का आकार", "prof.soil": "मिट्टी", "prof.irrigation": "सिंचाई",
+  "tag.unavailable": "उपलब्ध नहीं", "res.nothing": "कुछ नहीं मिला।", "res.nonotes": "कोई मेल खाता नोट नहीं मिला।",
+  "kb.source": "KRISHAK के शुरुआती नोट्स (सामान्य कृषि जानकारी, आधिकारिक सलाह नहीं)",
+  "wx.now": "{place} · अभी {t}°C, नमी {h}%, हवा {w} किमी/घंटा",
+  "wx.day": "{min}–{max}°C · बारिश {rain} मिमी ({pct}%) · हवा ≤{wind} किमी/घंटा",
+  "wx.fail": "ताज़ा मौसम की जानकारी नहीं मिल सकी{reason}। एआई को बताया गया था कि मौसम की जानकारी उपलब्ध नहीं है।",
+  "wx.r.not_found": "नक्शे पर “{place}” नहीं मिला", "wx.r.no_data": "मौसम सेवा ने कोई जानकारी नहीं दी", "wx.r.unavailable": "मौसम सेवा से संपर्क नहीं हो सका",
+  "wx.used": "एआई ने इस्तेमाल किया: {s}",
+  "src.profile": "किसान की जानकारी: इसी डिवाइस पर सहेजी गई", "src.kb": "ज्ञान: शुरुआती नोट्स (आधिकारिक सलाह नहीं)",
+  "src.weather": "मौसम: {source}, प्राप्त किया गया {time}", "src.noweather": "मौसम: प्राप्त नहीं हुआ", "src.model": "एआई मॉडल: {model}, तैयार किया गया {time}",
+  "stale.en": "यह जवाब अंग्रेज़ी में लिखा गया था।", "stale.hi": "यह जवाब हिन्दी में लिखा गया था।",
+  "stale.btn": "यही जवाब हिन्दी में पाएँ",
+  "e.banner": "कोई सलाह तैयार नहीं हो सकी।",
+  "e.offline": "एआई इंजन चालू करें: <code>server</code> फ़ोल्डर में टर्मिनल खोलें और <code>npm start</code> चलाएँ। README.txt देखें।",
+  "e.unreachable": "इस कंप्यूटर पर एआई इंजन से संपर्क नहीं हो सका।",
+  "e.generic": "एआई इंजन में कोई गड़बड़ी हुई।",
+  "e.bad_request": "कृपया सवाल और खेत की पूरी जानकारी भेजें।",
+  "e.no_key": "एआई कुंजी (API key) नहीं मिली। start-krishak.bat को फिर से चलाएँ और कुंजी डालें (Anthropic sk-ant-... या मुफ़्त Gemini AIza...)।",
+  "e.too_large": "अनुरोध बहुत बड़ा है।",
+  "e.origin": "इस स्रोत की अनुमति नहीं है।",
+  "e.not_found": "नहीं मिला।",
+  "e.ai_format": "एआई का जवाब अपेक्षित रूप में नहीं आया। कृपया फिर से कोशिश करें।",
+  "e.ai_timeout": "एआई ने बहुत समय लिया या कनेक्शन टूट गया ({detail})। हो सकता है Google व्यस्त हो; कृपया एक मिनट बाद फिर कोशिश करें।",
+  "e.ai_key": "Google ने इस कुंजी को स्वीकार नहीं किया ({detail})। aistudio.google.com पर नए प्रोजेक्ट में नई कुंजी बनाएँ, या इसके बजाय Anthropic की कुंजी इस्तेमाल करें।",
+  "e.ai_error": "एआई सेवा से त्रुटि मिली: {detail}",
+  "modal.title": "खेत की जानकारी बदलें",
+  "f.name": "नाम", "f.loc": "स्थान", "f.crop": "फ़सल", "f.stage": "फ़सल की वृद्धि की अवस्था", "f.size": "खेत का आकार (एकड़)", "f.soil": "मिट्टी का प्रकार", "f.irr": "सिंचाई",
+  "btn.cancel": "रद्द करें", "btn.save": "बदलाव सहेजें",
+  "v.name": "किसान का नाम लिखें।", "v.loc": "गाँव, कस्बा या ज़िला लिखें।", "v.crop": "जो फ़सल आप उगा रहे हैं, उसका नाम लिखें।", "v.size": "खेत का आकार 0 एकड़ से ज़्यादा लिखें।",
+  "stage.Sowing": "बुवाई", "stage.Germination": "अंकुरण", "stage.Vegetative": "वानस्पतिक वृद्धि", "stage.Flowering": "फूल आना", "stage.Grain filling": "दाना भरना", "stage.Maturity": "पकना (परिपक्वता)", "stage.Harvest": "कटाई",
+  "soil.Loamy": "दोमट", "soil.Sandy": "बलुई", "soil.Clay": "चिकनी (मटियार)", "soil.Silt": "गाद वाली (सिल्ट)", "soil.Sandy loam": "बलुई दोमट", "soil.Clay loam": "चिकनी दोमट", "soil.Black (regur)": "काली (रेगुर)", "soil.Red": "लाल",
+  "irr.Available": "उपलब्ध", "irr.Limited": "सीमित", "irr.Not available": "उपलब्ध नहीं",
+  "photo.aria": "फ़सल की फ़ोटो से जाँच", "photo.title": "फ़ोटो से अपनी फ़सल की जाँच करें",
+  "photo.help": "अपनी फ़सल की पत्तियों या प्रभावित हिस्से की साफ़, पास से ली गई फ़ोटो लें। फिर पूछें कि खाद या कीटनाशक डालना चाहिए या नहीं। आपका सवाल हल करने के लिए फ़ोटो एआई सेवा को भेजी जाती है; KRISHAK उसे सहेजता नहीं है।",
+  "photo.take": "📷 फ़ोटो खींचें", "photo.choose": "🖼️ फ़ोटो चुनें", "photo.remove": "फ़ोटो हटाएँ", "photo.alt": "आपकी फ़सल की फ़ोटो",
+  "photo.processing": "आपकी फ़ोटो तैयार की जा रही है…", "photo.ready": "फ़ोटो तैयार है। अपना सवाल लिखें या बोलें, या “KRISHAK से पूछें” दबाएँ।",
+  "photo.err.type": "यह फ़ाइल फ़ोटो नहीं है। कृपया कोई फ़ोटो (JPEG, PNG या WebP) चुनें।", "photo.err.read": "यह फ़ोटो खुल नहीं सकी। कृपया दूसरी फ़ोटो चुनें या नई फ़ोटो खींचें।",
+  "photo.chip": "क्या मुझे इस फ़सल पर खाद या कीटनाशक डालना चाहिए?", "photo.defaultq": "क्या मुझे इस फ़सल पर खाद या कीटनाशक डालना चाहिए?",
+  "photo.res.title": "फ़सल की फ़ोटो से जाँच", "photo.res.seen": "फ़ोटो में दिखी फ़सल: {c}", "photo.res.fert": "खाद", "photo.res.pest": "कीटनाशक",
+  "photo.poor": "फ़ोटो इतनी साफ़ नहीं है कि कुछ कहा जा सके। कृपया प्रभावित पत्तियों की पास से, अच्छी रोशनी में, फ़ोकस वाली फ़ोटो लेकर फिर पूछें।",
+  "photo.v.yes": "शायद ज़रूरी है", "photo.v.no": "अभी ज़रूरी नहीं", "photo.v.wait": "रुकें / पहले जाँच लें", "photo.v.unclear": "फ़ोटो से पता नहीं चलता",
+  "photo.disclaimer": "सिर्फ़ फ़ोटो से रोग या पोषक तत्व की कमी पक्की नहीं हो सकती। रसायन खरीदने या छिड़कने से पहले अपने नज़दीकी कृषि विज्ञान केंद्र (KVK) या कृषि अधिकारी से पूछ लें।",
+  "photo.loading": "आपकी फ़सल की फ़ोटो देखी जा रही है, स्थानीय मौसम देखा जा रहा है और फ़सल के नोट्स देखे जा रहे हैं…",
+  "e.bad_image": "फ़ोटो पढ़ी नहीं जा सकी। कृपया JPEG, PNG या WebP फ़ोटो इस्तेमाल करें।", "e.image_too_large": "फ़ोटो बहुत बड़ी है। कृपया छोटी फ़ोटो लें।",
+  "nav.mandi": "मंडी भाव",
+  "mandi.title": "मंडी भाव", "mandi.sub": "मंडियों में दर्ज थोक भाव (एगमार्कनेट, भारत सरकार)। बेचने से पहले इन्हें ज़रूर देख लें।",
+  "mandi.crop": "फ़सल", "mandi.state": "राज्य", "mandi.go": "भाव देखें", "mandi.pick": "अपना राज्य चुनें", "mandi.pickmsg": "मंडी भाव देखने के लिए ऊपर अपना राज्य चुनें।",
+  "mandi.loading": "ताज़ा मंडी भाव लाए जा रहे हैं…",
+  "mandi.nokey": "मंडी भाव के लिए data.gov.in की मुफ़्त API कुंजी चाहिए। data.gov.in पर खाता बनाएँ, My Account से कुंजी लें, फिर start-krishak.bat पूछे तब उसे चिपकाएँ (या server/.env में DATA_GOV_API_KEY डालें) और दोबारा चालू करें।",
+  "mandi.norecords": "{state} में {crop} के हाल के भाव दर्ज नहीं मिले। कोई दूसरा फ़सल नाम या राज्य आज़माएँ, या बाद में फिर देखें।",
+  "mandi.avg": "औसत मॉडल भाव", "mandi.high": "सबसे ऊँचा मॉडल भाव", "mandi.low": "सबसे कम मॉडल भाव", "mandi.nmandis": "{n} मंडियों का", "mandi.at": "{m} में",
+  "mandi.col.market": "मंडी", "mandi.col.variety": "किस्म", "mandi.col.min": "न्यूनतम", "mandi.col.max": "अधिकतम", "mandi.col.modal": "मॉडल", "mandi.col.date": "तारीख़",
+  "mandi.unit": "भाव ₹ प्रति क्विंटल (100 किलो) में हैं। “मॉडल” यानी उस दिन का सबसे आम भाव।", "mandi.near": "आपके पास", "mandi.perkg": "≈ ₹{kg} प्रति किलो",
+  "mandi.src": "स्रोत: {source}। सबसे नई भाव-तारीख़: {date}। लाया गया: {time}।",
+  "mandi.disclaimer": "ये मंडी के थोक भाव हैं। ये एक दिन या उससे ज़्यादा पुराने हो सकते हैं, और आपको मिलने वाला भाव गुणवत्ता, किस्म और शुल्क पर निर्भर करता है। बेचने से पहले अपनी मंडी में पक्का कर लें।",
+  "mandi.st.checking": "मंडी भाव: जाँच हो रही है…", "mandi.st.on": "मंडी भाव: तैयार", "mandi.st.nokey": "मंडी भाव: data.gov.in कुंजी जोड़ें", "mandi.st.down": "मंडी भाव: सर्वर चालू नहीं है",
+  "e.no_mandi_key": "मंडी भाव के लिए data.gov.in की मुफ़्त API कुंजी चाहिए। README.txt देखें।",
+  "e.mandi_key": "data.gov.in ने API कुंजी स्वीकार नहीं की ({detail})। कृपया कुंजी जाँचें।",
+  "e.mandi_error": "मंडी भाव सेवा से त्रुटि मिली: {detail}", "e.mandi_timeout": "मंडी भाव सेवा में बहुत समय लगा या जुड़ नहीं पाई। कृपया दोबारा कोशिश करें।",
+  "footer": "KRISHAK · आपका खेत। आपकी परिस्थिति। समझदार फ़ैसले।"
+}
+};
+/* Crop names are free text typed by the farmer. For display only, well-known English crop names are shown in Hindi;
+   the stored value and what is sent to the server never change. */
+const CROP_HI = { wheat:"गेहूँ", rice:"चावल", paddy:"धान", maize:"मक्का", corn:"मक्का", sugarcane:"गन्ना", cotton:"कपास", mustard:"सरसों", potato:"आलू", tomato:"टमाटर", onion:"प्याज",
+  soybean:"सोयाबीन", gram:"चना", chickpea:"चना", barley:"जौ", bajra:"बाजरा", "pearl millet":"बाजरा", jowar:"ज्वार", sorghum:"ज्वार", groundnut:"मूँगफली", peanut:"मूँगफली", pea:"मटर", lentil:"मसूर",
+  arhar:"अरहर", "pigeon pea":"अरहर", banana:"केला", mango:"आम", millet:"बाजरा", ragi:"रागी", sesame:"तिल", sunflower:"सूरजमुखी", garlic:"लहसुन", cauliflower:"फूलगोभी", cabbage:"पत्तागोभी", brinjal:"बैंगन" };
+</script>
+<script>
+const KEY = "krishak.farmerProfile.v1";
+const LANG_KEY = "krishak.lang.v1";
+const DEFAULTS = { name:"Rajesh Kumar", location:"Kanpur, Uttar Pradesh", crop:"Wheat", stage:"Vegetative", sizeAcres:2, soil:"Loamy", irrigation:"Available" };
+// Stored/sent values stay English; labels come from I18N ("stage.<value>", "soil.<value>", "irr.<value>").
+const STAGES = ["Sowing","Germination","Vegetative","Flowering","Grain filling","Maturity","Harvest"];
+const SOILS = ["Loamy","Sandy","Clay","Silt","Sandy loam","Clay loam","Black (regur)","Red"];
+const IRR = ["Available","Limited","Not available"];
+const SUGGESTED = ["photo.chip","chip.spray","chip.irrigate","chip.stage"];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- language ---------- */
+let LANG = "en";
+try { const s = localStorage.getItem(LANG_KEY); if (s === "en" || s === "hi") LANG = s; } catch {}
+// t("key", {var}) -> text in the current language (falls back to English, then to the key itself).
+function t(key, vars) {
+  let s = (I18N[LANG] && I18N[LANG][key]) ?? I18N.en[key] ?? key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  return s;
+}
+// Label for a stored value ("Vegetative" -> "वानस्पतिक वृद्धि"); unknown values are shown unchanged.
+const label = (prefix, v) => (I18N.en[prefix + "." + v] !== undefined ? t(prefix + "." + v) : v);
+const cropLabel = (c) => (LANG === "hi" ? CROP_HI[String(c).trim().toLowerCase()] || c : c);
+const locale = () => (LANG === "hi" ? "hi-IN" : undefined);
+// Hindi uses 24-hour time so no Latin "am/pm" appears; digits stay 0-9 in both languages.
+const fmt = (d) => { try { return new Date(d).toLocaleString(locale(), LANG === "hi" ? { hour12: false } : undefined); } catch { return d; } };
+
+// Translate every element that carries a data-i18n* attribute inside `root`.
+function applyI18n(root = document) {
+  root.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  root.querySelectorAll("[data-i18n-html]").forEach((el) => { el.innerHTML = t(el.dataset.i18nHtml); });
+  root.querySelectorAll("[data-i18n-placeholder]").forEach((el) => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  root.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t(el.dataset.i18nAria)); });
+}
+
+/* ---------- profile ---------- */
+let profile;
+try { profile = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch { profile = { ...DEFAULTS }; }
+function save(p) { profile = p; try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {} renderProfile(); syncMandiInputs(); loadMandi(); }
+
+function renderProfile() {
+  const h = new Date().getHours();
+  const first = profile.name.trim().split(/\s+/)[0] || t("greet.farmer");
+  $("hello").textContent = t(h < 12 ? "greet.morning" : h < 17 ? "greet.afternoon" : "greet.evening") + ", " + first;
+  $("avatar").textContent = profile.name.trim().split(/\s+/).slice(0,2).map((s) => s[0]).join("").toUpperCase() || "F";
+  const n = Number(profile.sizeAcres);
+  const rows = [["fact.farmer",profile.name],["fact.location",profile.location],["fact.crop",cropLabel(profile.crop)],["fact.stage",label("stage",profile.stage)],["fact.size",t(n === 1 ? "size.one" : "size.many", { n })],["fact.soil",label("soil",profile.soil)],["fact.irrigation",label("irr",profile.irrigation)]];
+  $("facts").innerHTML = rows.map(([k,v]) => `<div><dt>${esc(t(k))}</dt><dd>${esc(v)}</dd></div>`).join("");
+}
+
+$("chips").innerHTML = SUGGESTED.map((k) => `<button type="button" class="chip" data-i18n="${k}"></button>`).join("");
+$("chips").addEventListener("click", (e) => { if (e.target.classList.contains("chip")) { $("q").value = e.target.textContent; hideQErr(); $("q").focus(); } });
+$("menu").onclick = () => { const o = $("nav").classList.toggle("open"); $("menu").setAttribute("aria-expanded", o); };
+$("nav").onclick = () => $("nav").classList.remove("open");
+function hideQErr() { $("qerr").hidden = true; delete $("qerr").dataset.i18n; $("q").removeAttribute("aria-invalid"); }
+
+/* ---------- engine status ---------- */
+const API = "http://localhost:8787";
+/* Multilingual voice: browser speech recognition + speech synthesis. The chosen language is also sent to Gemini. */
+const VOICE_LOCALES = { en:"en-IN", hi:"hi-IN", pa:"pa-IN", ta:"ta-IN", te:"te-IN" };
+const VOICE_LABELS = { en:"English", hi:"हिन्दी", pa:"ਪੰਜਾਬੀ", ta:"தமிழ்", te:"తెలుగు" };
+let recognition = null;
+function setVoiceStatus(message) { const el = $("voiceStatus"); if (el) el.textContent = message; }
+function stopSpeaking() { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); }
+function speakText(text) {
+  if (!("speechSynthesis" in window)) { setVoiceStatus("Speech playback is not supported by this browser."); return; }
+  stopSpeaking(); const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = VOICE_LOCALES[$("voiceLang").value] || "en-IN";
+  const voices = window.speechSynthesis.getVoices();
+  const prefix = utterance.lang.toLowerCase();
+  const voice = voices.find(v => v.lang.toLowerCase() === prefix) || voices.find(v => v.lang.toLowerCase().startsWith(prefix.split("-")[0]));
+  if (voice) utterance.voice = voice;
+  utterance.onstart = () => setVoiceStatus("🔊 Speaking in " + VOICE_LABELS[$("voiceLang").value] + "…");
+  utterance.onend = () => setVoiceStatus("Voice playback finished.");
+  utterance.onerror = () => setVoiceStatus("Voice playback failed. Check installed voices on your device.");
+  window.speechSynthesis.speak(utterance);
+}
+function startVoiceInput() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { setVoiceStatus("Voice input is not supported here. Please use the latest Chrome or Edge, or type your question."); return; }
+  if (recognition) { try { recognition.abort(); } catch {} }
+  recognition = new SR(); recognition.lang = VOICE_LOCALES[$("voiceLang").value] || "en-IN";
+  recognition.interimResults = true; recognition.continuous = false;
+  let finalTranscript = "";
+  const micButton = $("voiceInput");
+  recognition.onstart = () => { micButton.classList.add("listening"); micButton.textContent = "🔴 Listening…"; setVoiceStatus("🎙️ Listening in " + VOICE_LABELS[$("voiceLang").value] + ". Speak your farm problem now…"); };
+  recognition.onresult = (event) => { let finalText = "", interim = ""; for (let i=event.resultIndex;i<event.results.length;i++) { if(event.results[i].isFinal) finalText += event.results[i][0].transcript; else interim += event.results[i][0].transcript; } if(finalText) { finalTranscript += (finalTranscript ? " " : "") + finalText.trim(); $("q").value = finalTranscript; setVoiceStatus("Recognized: " + finalTranscript + ". Sending your question to KRISHAK…"); } else if(interim) setVoiceStatus("Hearing: " + interim); };
+  recognition.onerror = (event) => { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; setVoiceStatus(event.error === "not-allowed" ? "Microphone permission denied. Click the lock icon near the browser address and allow Microphone." : "Voice input error (" + event.error + "). Try Chrome/Edge and allow microphone, or type your question."); };
+  recognition.onend = () => { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; recognition = null; if (finalTranscript.trim().length >= 5) { hideQErr(); $("askForm").requestSubmit(); } else if (!finalTranscript.trim()) setVoiceStatus("No speech detected. Tap the microphone and try again."); };
+  try { recognition.start(); } catch { micButton.classList.remove("listening"); micButton.textContent = "🎙️ Tap to Speak"; setVoiceStatus("Could not start the microphone. Use Chrome/Edge, allow microphone access, and try again."); }
+}
+$("voiceInput").addEventListener("click", startVoiceInput);
+$("voiceStop").addEventListener("click", () => { if(recognition) { try { recognition.abort(); } catch {} recognition = null; } $("voiceInput").classList.remove("listening"); $("voiceInput").textContent = "🎙️ Tap to Speak"; stopSpeaking(); setVoiceStatus("Voice stopped."); });
+$("voiceLang").addEventListener("change", () => { setVoiceStatus("Selected language: " + VOICE_LABELS[$("voiceLang").value] + ". Tap the microphone to ask your farm problem."); });
+
+/* ---------- crop photo ---------- */
+let photo = null;   // { mime, data (base64, no prefix), url (data: URL for preview) }
+const MAX_SIDE = 1280;  // photos are shrunk in the browser first: faster upload, less data, same detail for leaf checks
+function photoStatus(key, bad) { const el = $("photoStatus"); if (key) { el.dataset.i18n = key; el.textContent = t(key); } else { delete el.dataset.i18n; el.textContent = ""; } el.classList.toggle("bad", Boolean(bad)); }
+function showPhoto() {
+  $("photoPrev").hidden = !photo;
+  if (photo) { $("photoImg").src = photo.url; $("photoName").textContent = photo.name || ""; }
+}
+async function loadBitmap(file) {
+  try { return await createImageBitmap(file, { imageOrientation: "from-image" }); }
+  catch { return await new Promise((ok, no) => { const u = URL.createObjectURL(file), i = new Image(); i.onload = () => { URL.revokeObjectURL(u); ok(i); }; i.onerror = () => { URL.revokeObjectURL(u); no(new Error("read")); }; i.src = u; }); }
+}
+async function handlePhoto(file) {
+  if (!file) return;
+  if (file.type && !/^image\//.test(file.type)) { photoStatus("photo.err.type", true); return; }
+  photoStatus("photo.processing");
+  try {
+    const bmp = await loadBitmap(file), w = bmp.width || bmp.naturalWidth, h = bmp.height || bmp.naturalHeight;
+    if (!w || !h) throw new Error("empty");
+    const sc = Math.min(1, MAX_SIDE / Math.max(w, h)), c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(w * sc)); c.height = Math.max(1, Math.round(h * sc));
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+    if (bmp.close) bmp.close();
+    const url = c.toDataURL("image/jpeg", 0.85);
+    photo = { mime: "image/jpeg", data: url.split(",")[1], url, name: file.name || "" };
+    showPhoto(); photoStatus("photo.ready");
+  } catch { photo = null; showPhoto(); photoStatus("photo.err.read", true); }
+}
+$("photoCam").onclick = () => $("photoCamIn").click();
+$("photoPick").onclick = () => $("photoPickIn").click();
+for (const id of ["photoCamIn", "photoPickIn"]) $(id).addEventListener("change", (e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; handlePhoto(f); });
+$("photoRemove").onclick = () => { photo = null; showPhoto(); photoStatus(null); };
+
+const setSt = (id, on, key) => { const el = $(id); el.firstElementChild.className = on ? "" : "off"; el.lastElementChild.dataset.i18n = key; el.lastElementChild.textContent = t(key); };
+async function checkEngine() {
+  try {
+    const h = await (await fetch(API + "/api/health", { signal: AbortSignal.timeout(4000) })).json();
+    const bad = h.aiConfigured && h.aiCheck && h.aiCheck.ok === false;
+    setSt("st-ai", h.aiConfigured && !bad, bad ? "ai.bad" : h.aiConfigured ? "ai.connected" : "ai.nokey");
+    if (bad) $("st-ai").lastElementChild.textContent = t("ai.bad") + ": " + h.aiCheck.message.slice(0, 140);
+    if (h.aiConfigured && h.aiCheck === null) setTimeout(checkEngine, 3000);   // key test still running
+    setSt("st-wx", true, "wx.live");
+    setSt("st-mandi", h.mandiConfigured, h.mandiConfigured ? "mandi.st.on" : "mandi.st.nokey");
+  } catch { setSt("st-ai", false, "ai.down"); setSt("st-wx", false, "wx.down"); setSt("st-mandi", false, "mandi.st.down"); }
+}
+
+/* ---------- recommendation view (re-rendered whenever the language changes) ---------- */
+let view = { kind: "none" };   // none | loading | result {q,p,d} | error {err, offline}
+const tag = () => `<span class="tag">${esc(t("tag.unavailable"))}</span> `;
+const li = (a) => (a && a.length ? `<ul class="list">${a.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="unavailable">${tag()}${esc(t("res.nothing"))}</p>`);
+
+function photoBlock(d, img) {
+  const ph = d.photo; if (!ph) return "";
+  const vd = (key, v) => `<div class="verdict v-${esc(v.verdict)}"><h4>${esc(t(key))}</h4><span class="badge">${esc(t("photo.v." + v.verdict))}</span><p>${esc(v.reason)}</p></div>`;
+  return `<article class="block wide photo-result"><h3>${esc(t("photo.res.title"))}</h3>
+    ${ph.quality === "poor" ? `<div class="banner" role="alert">${esc(t("photo.poor"))}</div>` : ""}
+    <div class="photo-res-grid">${img ? `<img src="${esc(img)}" alt="${esc(t("photo.alt"))}">` : "<span></span>"}<div>
+      ${ph.cropSeen ? `<p class="small" style="margin-top:0">${esc(t("photo.res.seen", { c: ph.cropSeen }))}</p>` : ""}${li(ph.observations)}</div></div>
+    <div class="verdicts">${vd("photo.res.fert", ph.fertilizer)}${vd("photo.res.pest", ph.pesticide)}</div>
+    <p class="small">${esc(t("photo.disclaimer"))}</p></article>`;
+}
+function resultHTML(q, p, d, img) {
+  const w = d.externalData || {};
+  const reason = w.reasonCode ? t("wx.r." + w.reasonCode, { place: w.reasonPlace || "" }) : w.reason;
+  const wx = w.available
+    ? `<p class="small">${esc(t("wx.now", { place: w.place, t: w.current.tempC, h: w.current.humidityPct, w: w.current.windKmh }))}</p>
+       <ul class="plain">${w.days.map((x) => `<li><span>${esc(x.date)}</span>${esc(t("wx.day", { min: x.minC, max: x.maxC, rain: x.rainMm, pct: x.rainChancePct, wind: x.maxWindKmh }))}</li>`).join("")}</ul>`
+    : `<p class="unavailable">${tag()}${esc(t("wx.fail", { reason: reason ? " (" + reason + ")" : "" }))}</p>`;
+  const kn = (d.knowledge || []).length ? `<ul class="list">${d.knowledge.map((k) => `<li>${esc(k.title)}<br><span class="small">${esc(t("kb.source"))}</span></li>`).join("")}</ul>` : `<p class="unavailable">${tag()}${esc(t("res.nonotes"))}</p>`;
+  const src = [`<li>${esc(t("src.profile"))}</li>`, `<li>${esc(t("src.kb"))}</li>`,
+    w.available ? `<li>${esc(t("src.weather", { source: w.source, time: fmt(w.fetchedAt) }))}</li>` : `<li>${esc(t("src.noweather"))}</li>`,
+    `<li>${esc(t("src.model", { model: d.model, time: fmt(d.generatedAt) }))}</li>`].join("");
+  // Only offer "get this answer in <language>" for the two interface languages (the voice list also has pa/ta/te).
+  const stale = d.lang && d.lang !== LANG && I18N.en["stale." + d.lang]
+    ? `<div class="banner" role="status"><p>${esc(t("stale." + d.lang))}</p><button type="button" class="btn ghost" id="regen" style="margin-top:.6rem">${esc(t("stale.btn"))}</button></div>` : "";
+  const nAcres = Number(p.sizeAcres);
+  return `${stale}<div class="note" role="note"><strong>${esc(t("note.strong"))}</strong> ${esc(t("note.body"))}</div>
+  <h2>${esc(t("res.title"))}</h2><p class="asked">${esc(t("res.asked", { q }))}</p><button type="button" class="btn ghost" id="speakAnswer">🔊 Listen to this advice</button>
+  <div class="result-grid">
+   <article class="block wide"><h3>${esc(t("res.action"))}</h3><p class="action">${esc(d.action)}</p></article>
+   ${photoBlock(d, img)}
+   <article class="block"><h3>${esc(t("res.why"))}</h3>${li(d.reasons)}</article>
+   <article class="block"><h3>${esc(t("res.profile"))}</h3><ul class="plain"><li><span>${esc(t("prof.location"))}</span>${esc(p.location)}</li><li><span>${esc(t("prof.crop"))}</span>${esc(cropLabel(p.crop))} (${esc(label("stage", p.stage))})</li><li><span>${esc(t("prof.size"))}</span>${esc(t(nAcres === 1 ? "size.one" : "size.many", { n: p.sizeAcres }))}</li><li><span>${esc(t("prof.soil"))}</span>${esc(label("soil", p.soil))}</li><li><span>${esc(t("prof.irrigation"))}</span>${esc(label("irr", p.irrigation))}</li></ul>${(d.profileFactors || []).length ? li(d.profileFactors) : ""}</article>
+   <article class="block"><h3>${esc(t("res.knowledge"))}</h3>${kn}</article>
+   <article class="block"><h3>${esc(t("res.external"))}</h3>${wx}${d.weatherSummary ? `<p class="small">${esc(t("wx.used", { s: d.weatherSummary }))}</p>` : ""}</article>
+   <article class="block wide warn"><h3>${esc(t("res.uncertainty"))}</h3>${li(d.uncertainty)}</article>
+   <article class="block wide"><h3>${esc(t("res.sources"))}</h3><ul class="list">${src}</ul></article>
+  </div>`;
+}
+function errorText(err) {
+  if (err.code && I18N.en["e." + err.code]) return t("e." + err.code, { detail: err.detail || err.message || "" });
+  return err.message || t("e.generic");
+}
+function renderView() {
+  const r = $("result");
+  if (view.kind === "none") { r.hidden = true; return; }
+  r.hidden = false;
+  if (view.kind === "loading") r.innerHTML = `<div class="loading" role="status"><span class="spin"></span>${esc(t(view.withPhoto ? "photo.loading" : "loading"))}</div>`;
+  else if (view.kind === "result") {
+    r.innerHTML = resultHTML(view.q, view.p, view.d, view.image && view.image.url);
+    const rg = $("regen"); if (rg) rg.onclick = () => { if ([...$("voiceLang").options].some((o) => o.value === LANG)) $("voiceLang").value = LANG; ask(view.q, { image: view.image, lang: LANG }); };
+    const ph = view.d.photo, oldSpeak = $("speakAnswer");
+    if (oldSpeak) oldSpeak.onclick = () => speakText([view.d.action, ...(ph ? [ph.fertilizer.reason, ph.pesticide.reason] : []), ...(view.d.reasons || []), ...(view.d.uncertainty || [])].filter(Boolean).join(". "));
+  } else r.innerHTML = `<div class="banner" role="alert"><strong>${esc(t("e.banner"))}</strong> ${esc(errorText(view.err))}</div>` + (view.offline ? `<p class="unavailable">${t("e.offline")}</p>` : "");
+}
+
+async function ask(q, opts = {}) {
+  const btn = $("askForm").querySelector("[type=submit]"), p = { ...profile }, reqLang = LANG;
+  const image = opts.image !== undefined ? opts.image : photo;   // the attached crop photo, if any
+  btn.disabled = true; view = { kind: "loading", withPhoto: Boolean(image) }; renderView();
+  $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  try {
+    // The answer language is the one chosen in the voice/answer selector (kept in step with the interface language).
+    const answerLang = opts.lang || $("voiceLang")?.value || reqLang;
+    const res = await fetch(API + "/api/recommend", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ profile: p, question: q, lang: answerLang, image: image ? { mime: image.mime, data: image.data } : undefined }), signal: AbortSignal.timeout(150000) });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(d.error || ""), { server: true, code: d.code, detail: d.detail });
+    view = { kind: "result", q, p, image, d: { ...d, lang: d.lang || reqLang } };
+  } catch (err) {
+    view = err.server ? { kind: "error", err, offline: false } : { kind: "error", err: { code: "unreachable" }, offline: true };
+  } finally { btn.disabled = false; }
+  renderView(); checkEngine();
+}
+$("askForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  let q = $("q").value.trim();
+  if (q.length < 5 && photo) { q = t("photo.defaultq"); $("q").value = q; }   // photo with no typed question: ask the main question
+  if (q.length < 5) { $("qerr").dataset.i18n = "err.question"; $("qerr").textContent = t("err.question"); $("qerr").hidden = false; $("q").setAttribute("aria-invalid","true"); return; }
+  hideQErr(); ask(q);
+});
+
+/* ---------- profile modal ---------- */
+const opts = (list, prefix, cur) => list.map((o) => `<option value="${esc(o)}"${o === cur ? " selected" : ""}>${esc(label(prefix, o))}</option>`).join("");
+const fld = (key, id, inner, cls = "") => `<div class="field ${cls}"><label for="${id}" data-i18n="${key}"></label>${inner}<p class="error" id="e-${id}" role="alert" hidden></p></div>`;
+let modalErrors = {};   // field id -> translation key of the current validation message
+function renderModal(p) {
+  $("pform").innerHTML = `<h2 id="mh" data-i18n="modal.title"></h2><div class="form-grid">
+   ${fld("f.name","f-name",`<input id="f-name" value="${esc(p.name)}">`)}
+   ${fld("f.loc","f-loc",`<input id="f-loc" value="${esc(p.location)}">`)}
+   ${fld("f.crop","f-crop",`<input id="f-crop" value="${esc(p.crop)}">`)}
+   ${fld("f.stage","f-stage",`<select id="f-stage">${opts(STAGES,"stage",p.stage)}</select>`)}
+   ${fld("f.size","f-size",`<input id="f-size" type="number" min="0" step="0.1" inputmode="decimal" value="${esc(p.sizeAcres)}">`)}
+   ${fld("f.soil","f-soil",`<select id="f-soil">${opts(SOILS,"soil",p.soil)}</select>`)}
+   ${fld("f.irr","f-irr",`<select id="f-irr">${opts(IRR,"irr",p.irrigation)}</select>`)}
+  </div><div class="actions"><button type="button" class="btn ghost" id="cancel" data-i18n="btn.cancel"></button><button type="submit" class="btn primary" data-i18n="btn.save"></button></div>`;
+  applyI18n($("pform"));
+  for (const [id, key] of Object.entries(modalErrors)) { const el = $("e-" + id); el.dataset.i18n = key; el.textContent = t(key); el.hidden = false; }
+  $("cancel").onclick = closeModal;
+}
+function openModal() {
+  modalErrors = {};
+  renderModal(profile);
+  $("overlay").hidden = false; document.body.style.overflow = "hidden"; $("f-name").focus();
+}
+function closeModal() { $("overlay").hidden = true; document.body.style.overflow = ""; $("edit").focus(); }
+$("edit").onclick = openModal;
+$("overlay").addEventListener("mousedown", (e) => { if (e.target === $("overlay")) closeModal(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("overlay").hidden) closeModal(); });
+$("pform").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const v = { name:$("f-name").value.trim(), location:$("f-loc").value.trim(), crop:$("f-crop").value.trim(), size:Number($("f-size").value) };
+  const errs = { "f-name": !v.name && "v.name", "f-loc": !v.location && "v.loc", "f-crop": !v.crop && "v.crop", "f-size": !(v.size > 0 && v.size <= 10000) && "v.size" };
+  let bad = false; modalErrors = {};
+  for (const [id, key] of Object.entries(errs)) { const el = $("e-" + id); el.hidden = !key; if (key) { el.dataset.i18n = key; el.textContent = t(key); modalErrors[id] = key; bad = true; } else { delete el.dataset.i18n; el.textContent = ""; } }
+  if (bad) return;
+  save({ name:v.name, location:v.location, crop:v.crop, stage:$("f-stage").value, sizeAcres:v.size, soil:$("f-soil").value, irrigation:$("f-irr").value });
+  closeModal();
+});
+
+/* ---------- mandi prices (official Agmarknet data, fetched by the local server) ---------- */
+// State names are spelled the way Agmarknet spells them (e.g. "Uttrakhand", "Chattisgarh", "NCT of Delhi").
+const MANDI_STATES = ["Andaman and Nicobar","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh","Chattisgarh","Dadra and Nagar Haveli","Daman and Diu","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Ladakh","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","NCT of Delhi","Odisha","Pondicherry","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttrakhand","West Bengal"];
+const STATE_ALIAS = { delhi:"NCT of Delhi", "new delhi":"NCT of Delhi", uttarakhand:"Uttrakhand", chhattisgarh:"Chattisgarh", orissa:"Odisha", "jammu & kashmir":"Jammu and Kashmir", puducherry:"Pondicherry", "andaman and nicobar islands":"Andaman and Nicobar" };
+function detectState(loc) {
+  const parts = String(loc || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean).reverse();
+  for (const x of parts) { const hit = MANDI_STATES.find((s) => s.toLowerCase() === x) || STATE_ALIAS[x]; if (hit) return hit; }
+  return "";
+}
+let mandi = { kind: "none" };   // none | loading | result {d, crop} | error {err, offline} | pick
+function syncMandiInputs() {
+  $("mCrop").value = profile.crop;
+  const st = detectState(profile.location);
+  $("mState").innerHTML = `<option value="">${esc(t("mandi.pick"))}</option>` + MANDI_STATES.map((s) => `<option value="${esc(s)}"${s === st ? " selected" : ""}>${esc(s)}</option>`).join("");
+}
+const inr = (n) => "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+function renderMandiBody() {
+  const el = $("mandiBody"), m = mandi;
+  if (m.kind === "none") { el.innerHTML = ""; return; }
+  if (m.kind === "loading") { el.innerHTML = `<div class="loading"><span class="spin"></span>${esc(t("mandi.loading"))}</div>`; return; }
+  if (m.kind === "pick") { el.innerHTML = `<p class="unavailable">${esc(t("mandi.pickmsg"))}</p>`; return; }
+  if (m.kind === "error") {
+    if (m.err.code === "no_mandi_key") { el.innerHTML = `<div class="banner" role="alert">${esc(t("mandi.nokey"))}</div>`; return; }
+    el.innerHTML = `<div class="banner" role="alert">${esc(errorText(m.err))}</div>` + (m.offline ? `<p class="unavailable">${t("e.offline")}</p>` : "");
+    return;
+  }
+  const d = m.d, s = d.stats;
+  if (!d.rows.length) { el.innerHTML = `<p class="unavailable">${esc(t("mandi.norecords", { crop: m.crop, state: d.state }))}</p>`; return; }
+  const kg = (n) => (n / 100).toLocaleString("en-IN", { maximumFractionDigits: 1 });
+  const rows = d.rows.map((x) => `<tr class="${x.nearby ? "near" : ""}"><td>${esc(x.market)}${x.district && x.district !== x.market ? `<br><span class="small">${esc(x.district)}</span>` : ""}${x.nearby ? `<span class="badge-near">${esc(t("mandi.near"))}</span>` : ""}</td>
+    <td>${esc(x.variety || "–")}</td><td class="num">${x.min == null ? "–" : esc(inr(x.min))}</td><td class="num">${x.max == null ? "–" : esc(inr(x.max))}</td><td class="num mprice">${esc(inr(x.modal))}</td><td>${esc(x.date)}</td></tr>`).join("");
+  el.innerHTML = `<dl class="mstats">
+      <div class="mstat"><dt>${esc(t("mandi.avg"))}</dt><dd>${esc(inr(s.avgModal))}<small>${esc(t("mandi.nmandis", { n: s.mandis }))} · ${esc(t("mandi.perkg", { kg: kg(s.avgModal) }))}</small></dd></div>
+      <div class="mstat"><dt>${esc(t("mandi.high"))}</dt><dd>${esc(inr(s.maxModal))}<small>${esc(t("mandi.at", { m: s.bestMarket }))} · ${esc(t("mandi.perkg", { kg: kg(s.maxModal) }))}</small></dd></div>
+      <div class="mstat"><dt>${esc(t("mandi.low"))}</dt><dd>${esc(inr(s.minModal))}<small>${esc(t("mandi.perkg", { kg: kg(s.minModal) }))}</small></dd></div></dl>
+    <div class="mtable-wrap"><table class="mtable"><thead><tr><th>${esc(t("mandi.col.market"))}</th><th>${esc(t("mandi.col.variety"))}</th><th class="num">${esc(t("mandi.col.min"))}</th><th class="num">${esc(t("mandi.col.max"))}</th><th class="num">${esc(t("mandi.col.modal"))}</th><th>${esc(t("mandi.col.date"))}</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <p class="small">${esc(t("mandi.unit"))}</p>
+    <p class="small">${esc(t("mandi.src", { source: d.source, date: d.latestDate, time: fmt(d.fetchedAt) }))}</p>
+    <div class="note" style="margin:.8rem 0 0" role="note">${esc(t("mandi.disclaimer"))}</div>`;
+}
+async function loadMandi() {
+  const crop = $("mCrop").value.trim(), state = $("mState").value;
+  if (!state) { mandi = { kind: "pick" }; renderMandiBody(); return; }
+  if (crop.length < 2) { mandi = { kind: "none" }; renderMandiBody(); return; }
+  const district = String(profile.location || "").split(",")[0].trim(), btn = $("mGo");
+  btn.disabled = true; mandi = { kind: "loading" }; renderMandiBody();
+  try {
+    const res = await fetch(API + "/api/mandi?" + new URLSearchParams({ state, crop, district }), { signal: AbortSignal.timeout(30000) });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(d.error || ""), { server: true, code: d.code, detail: d.detail });
+    mandi = { kind: "result", d, crop };
+  } catch (err) { mandi = err.server ? { kind: "error", err, offline: false } : { kind: "error", err: { code: "unreachable" }, offline: true }; }
+  finally { btn.disabled = false; }
+  renderMandiBody();
+}
+$("mGo").onclick = loadMandi;
+$("mCrop").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); loadMandi(); } });
+$("mState").addEventListener("change", loadMandi);
+
+/* ---------- language switcher ---------- */
+function setLang(lang, announce) {
+  LANG = lang === "hi" ? "hi" : "en";
+  try { localStorage.setItem(LANG_KEY, LANG); } catch {}
+  document.documentElement.lang = LANG;
+  document.title = t("app.title");
+  document.querySelectorAll(".lang-btn").forEach((b) => { const on = b.dataset.lang === LANG; b.setAttribute("aria-pressed", on); b.classList.toggle("on", on); });
+  applyI18n();
+  renderProfile();
+  $("photoImg").alt = t("photo.alt");
+  { const ms = $("mState").value, mc = $("mCrop").value; syncMandiInputs(); if (ms) $("mState").value = ms; if (mc) $("mCrop").value = mc; renderMandiBody(); }
+  // Answers follow the interface language by default (the voice selector can still be changed afterwards).
+  if ([...$("voiceLang").options].some((o) => o.value === LANG)) $("voiceLang").value = LANG;
+  // Keep what the farmer typed in the open dialog, then redraw it in the new language.
+  if (!$("overlay").hidden) {
+    const draft = { ...profile, name: $("f-name").value, location: $("f-loc").value, crop: $("f-crop").value, sizeAcres: $("f-size").value, stage: $("f-stage").value, soil: $("f-soil").value, irrigation: $("f-irr").value };
+    const f = document.activeElement && document.activeElement.id; renderModal(draft); if (f && $(f)) $(f).focus();
+  }
+  if ($("qerr").dataset.i18n) $("qerr").textContent = t($("qerr").dataset.i18n);
+  renderView();
+  if (announce) { const a = $("lang-live"); a.textContent = ""; setTimeout(() => { a.textContent = t("lang.switched"); }, 30); }
+}
+document.querySelectorAll(".lang-btn").forEach((b) => b.addEventListener("click", () => { if (b.dataset.lang !== LANG) setLang(b.dataset.lang, true); }));
+// Keep two open tabs in step.
+window.addEventListener("storage", (e) => { if (e.key === LANG_KEY && (e.newValue === "en" || e.newValue === "hi") && e.newValue !== LANG) setLang(e.newValue, false); });
+
+syncMandiInputs();
+setLang(LANG, false);
+checkEngine();
+loadMandi();
+</script>
+</body>
+</html>
